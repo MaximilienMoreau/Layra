@@ -1,0 +1,190 @@
+"use client";
+
+import { useRef, useState, useCallback, useEffect } from "react";
+import { useCanvas } from "@/hooks/useCanvas";
+import { useHistory } from "@/hooks/useHistory";
+import { useAI } from "@/hooks/useAI";
+import { useCanvasStore, CANVAS_FORMATS } from "@/store/canvasStore";
+import { Toolbar } from "./Toolbar";
+import { Loader2 } from "lucide-react";
+
+type Tool = "select" | "text" | "rect" | "circle" | "triangle" | "image";
+
+export function CanvasEditor() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeTool, setActiveTool] = useState<Tool>("select");
+  const [scale, setScale] = useState(0.4);
+
+  const { format, isGenerating, generationProgress, setFormat } = useCanvasStore();
+
+  const {
+    fabricRef,
+    loadLayout,
+    addText,
+    addShape,
+    addImage,
+    deleteSelected,
+    exportPNG,
+  } = useCanvas(canvasRef);
+
+  const { undo, redo } = useHistory(loadLayout);
+  const { generate } = useAI(fabricRef, loadLayout);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "y") {
+        e.preventDefault();
+        redo();
+      }
+      if (e.key === "Delete" || e.key === "Backspace") {
+        deleteSelected();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [undo, redo, deleteSelected]);
+
+  // Auto-scale canvas to fit container
+  useEffect(() => {
+    const updateScale = () => {
+      if (!containerRef.current) return;
+      const { width, height } = containerRef.current.getBoundingClientRect();
+      const padding = 80;
+      const scaleX = (width - padding) / format.width;
+      const scaleY = (height - padding) / format.height;
+      setScale(Math.min(scaleX, scaleY, 1));
+    };
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [format]);
+
+  const handleAddImage = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      await addImage(url);
+      setActiveTool("select");
+    },
+    [addImage]
+  );
+
+  const handleExport = useCallback(() => {
+    const dataUrl = exportPNG();
+    if (!dataUrl) return;
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `layra-design-${Date.now()}.png`;
+    a.click();
+  }, [exportPNG]);
+
+  // Expose generate for PromptBar (via window event)
+  useEffect(() => {
+    const onGenerate = (e: Event) => {
+      const ce = e as CustomEvent<{ prompt: string; reprompt: boolean }>;
+      generate(ce.detail.prompt, ce.detail.reprompt);
+    };
+    window.addEventListener("layra:generate", onGenerate);
+    return () => window.removeEventListener("layra:generate", onGenerate);
+  }, [generate]);
+
+  // Expose export for ExportModal
+  useEffect(() => {
+    const onExport = () => handleExport();
+    window.addEventListener("layra:export-png", onExport);
+    return () => window.removeEventListener("layra:export-png", onExport);
+  }, [handleExport]);
+
+  return (
+    <div className="flex flex-col h-full bg-gray-950">
+      {/* Format selector bar */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-gray-900 border-b border-gray-800 overflow-x-auto">
+        <span className="text-xs text-gray-500 shrink-0">Format :</span>
+        {CANVAS_FORMATS.map((f) => (
+          <button
+            key={f.name}
+            onClick={() => setFormat(f)}
+            className={`text-xs px-3 py-1 rounded-full whitespace-nowrap transition-colors ${
+              format.name === f.name
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+            }`}
+          >
+            {f.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Main editor area */}
+      <div className="flex flex-1 overflow-hidden">
+        <Toolbar
+          activeTool={activeTool}
+          onToolChange={setActiveTool}
+          onAddText={() => { addText(); setActiveTool("select"); }}
+          onAddShape={(t) => { addShape(t); setActiveTool("select"); }}
+          onAddImage={handleAddImage}
+          onDelete={deleteSelected}
+          onUndo={undo}
+          onRedo={redo}
+        />
+
+        {/* Canvas container */}
+        <div
+          ref={containerRef}
+          className="flex-1 flex items-center justify-center bg-gray-950 overflow-hidden relative"
+        >
+          {/* Loading overlay */}
+          {isGenerating && (
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-950/80 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-4 bg-gray-900 rounded-2xl p-8 border border-gray-700 shadow-2xl max-w-sm mx-4">
+                <Loader2 className="text-indigo-500 animate-spin" size={40} />
+                <p className="text-white font-medium text-center">{generationProgress}</p>
+                <div className="w-48 h-1 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-indigo-500 rounded-full animate-pulse w-3/4" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Canvas wrapper with shadow */}
+          <div
+            style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}
+            className="shadow-2xl shadow-black/50"
+          >
+            <canvas ref={canvasRef} />
+          </div>
+
+          {/* Scale indicator */}
+          <div className="absolute bottom-4 right-4 text-xs text-gray-600 bg-gray-900 px-2 py-1 rounded-md">
+            {Math.round(scale * 100)}% — {format.width}×{format.height}px
+          </div>
+        </div>
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+    </div>
+  );
+}

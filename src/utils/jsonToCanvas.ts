@@ -1,4 +1,4 @@
-import type { Canvas as FabricCanvas, FabricObject } from "fabric";
+import type { Canvas as FabricCanvas, FabricObject, TFiller } from "fabric";
 import type { ClaudeLayout, CanvasElement } from "./zodSchemas";
 
 export interface LayraMeta {
@@ -81,6 +81,53 @@ async function createElement(
     return obj;
   }
 
+  if (type === "video") {
+    // Fabric.js ne supporte pas la lecture vidéo native.
+    // On affiche un placeholder avec une icône play pour signaler l'élément.
+    const videoStyle = style as Record<string, unknown> | undefined;
+    const bg = new fabric.Rect({
+      left: x,
+      top: y,
+      width,
+      height,
+      fill: (videoStyle?.fill as string) || "#111827",
+      rx: 8,
+      ry: 8,
+      opacity: (videoStyle?.opacity as number) ?? 1,
+      selectable: !meta.locked,
+      visible: meta.visible,
+    });
+    bg.layra = { ...meta, name: content?.slice(0, 20) || "Vidéo" };
+
+    // Triangle play dessiné en SVG inline puis chargé comme FabricImage
+    const playSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><polygon points="16,8 56,32 16,56" fill="rgba(255,255,255,0.7)"/></svg>`;
+    const svgUrl = `data:image/svg+xml;base64,${btoa(playSvg)}`;
+    try {
+      const playIcon = await fabric.FabricImage.fromURL(svgUrl);
+      const iconSize = Math.min(width, height) * 0.25;
+      playIcon.scaleToWidth(iconSize);
+      playIcon.scaleToHeight(iconSize);
+      playIcon.set({
+        left: x + width / 2 - iconSize / 2,
+        top: y + height / 2 - iconSize / 2,
+        selectable: false,
+        evented: false,
+        visible: meta.visible,
+      });
+      // Retourne le groupe bg + icon via un Group Fabric
+      const group = new fabric.Group([bg, playIcon], {
+        left: x,
+        top: y,
+        selectable: !meta.locked,
+        visible: meta.visible,
+      });
+      group.layra = bg.layra;
+      return group;
+    } catch {
+      return bg;
+    }
+  }
+
   if (type === "image" && src) {
     try {
       const img = await fabric.FabricImage.fromURL(src, { crossOrigin: "anonymous" });
@@ -126,7 +173,7 @@ export async function jsonToCanvas(
         { offset: 1, color: background.gradient.to },
       ],
     });
-    canvas.backgroundColor = gradient as unknown as string;
+    canvas.backgroundColor = gradient as TFiller;
   } else if (background.type === "image" && background.value) {
     try {
       const bgImg = await fabricModule.FabricImage.fromURL(background.value, {

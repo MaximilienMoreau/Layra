@@ -6,7 +6,7 @@ import { useHistory } from "@/hooks/useHistory";
 import { useAI } from "@/hooks/useAI";
 import { useCanvasStore, CANVAS_FORMATS } from "@/store/canvasStore";
 import { Toolbar } from "./Toolbar";
-import { Loader2 } from "lucide-react";
+import { GenerationOverlay } from "@/components/ai/GenerationOverlay";
 
 type Tool = "select" | "text" | "rect" | "circle" | "triangle" | "image";
 
@@ -17,7 +17,8 @@ export function CanvasEditor() {
   const [activeTool, setActiveTool] = useState<Tool>("select");
   const [scale, setScale] = useState(0.4);
 
-  const { format, isGenerating, generationProgress, setFormat } = useCanvasStore();
+  const { format, isGenerating, generationProgress, generationError, historyIndex, history, setFormat, setGenerationError } =
+    useCanvasStore();
 
   const {
     fabricRef,
@@ -143,6 +144,8 @@ export function CanvasEditor() {
           onDelete={deleteSelected}
           onUndo={undo}
           onRedo={redo}
+          historyIndex={historyIndex}
+          historyLength={history.length}
         />
 
         {/* Canvas container */}
@@ -150,17 +153,13 @@ export function CanvasEditor() {
           ref={containerRef}
           className="flex-1 flex items-center justify-center bg-gray-950 overflow-hidden relative"
         >
-          {/* Loading overlay */}
-          {isGenerating && (
-            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-950/80 backdrop-blur-sm">
-              <div className="flex flex-col items-center gap-4 bg-gray-900 rounded-2xl p-8 border border-gray-700 shadow-2xl max-w-sm mx-4">
-                <Loader2 className="text-indigo-500 animate-spin" size={40} />
-                <p className="text-white font-medium text-center">{generationProgress}</p>
-                <div className="w-48 h-1 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-indigo-500 rounded-full animate-pulse w-3/4" />
-                </div>
-              </div>
-            </div>
+          {/* Generation overlay (loading + erreur) */}
+          {(isGenerating || generationError) && (
+            <GenerationOverlay
+              progress={generationProgress}
+              isError={!!generationError}
+              onDismiss={generationError ? () => setGenerationError(null) : undefined}
+            />
           )}
 
           {/* Canvas wrapper with shadow */}

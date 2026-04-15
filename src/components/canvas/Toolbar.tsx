@@ -14,6 +14,8 @@ type Props = {
   onDelete: () => void;
   onUndo: () => void;
   onRedo: () => void;
+  historyIndex?: number;
+  historyLength?: number;
 };
 
 const tools = [
@@ -25,7 +27,7 @@ const tools = [
   { id: "image" as Tool, icon: ImagePlus, label: "Image" },
 ];
 
-export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAddImage, onDelete, onUndo, onRedo }: Props) {
+export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAddImage, onDelete, onUndo, onRedo, historyIndex = -1, historyLength = 0 }: Props) {
   function handleToolClick(tool: Tool) {
     onToolChange(tool);
     if (tool === "text") onAddText();
@@ -38,18 +40,25 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
       {/* Undo/Redo */}
       <button
         onClick={onUndo}
-        className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-        title="Annuler (Ctrl+Z)"
+        disabled={historyIndex <= 0}
+        className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        title={`Annuler (Ctrl+Z)${historyIndex > 0 ? ` — étape ${historyIndex + 1}/${historyLength}` : ""}`}
       >
         <Undo2 size={16} />
       </button>
       <button
         onClick={onRedo}
-        className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-        title="Refaire (Ctrl+Y)"
+        disabled={historyIndex >= historyLength - 1}
+        className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        title={`Refaire (Ctrl+Y)${historyIndex < historyLength - 1 ? ` — étape ${historyIndex + 2}/${historyLength}` : ""}`}
       >
         <Redo2 size={16} />
       </button>
+      {historyLength > 0 && (
+        <span className="text-[9px] text-gray-700 tabular-nums" title="Position dans l'historique">
+          {historyIndex + 1}/{historyLength}
+        </span>
+      )}
 
       <div className="w-6 h-px bg-gray-700 my-1" />
 

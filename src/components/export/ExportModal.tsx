@@ -67,7 +67,7 @@ export function ExportModal({ onClose, onExportPNG, onExportJPEG }: Props) {
         {/* Format selection */}
         <div className="p-6 flex flex-col gap-3">
           <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
-            Format d'export
+            {"Format d'export"}
           </p>
           {formats.map((f) => (
             <button

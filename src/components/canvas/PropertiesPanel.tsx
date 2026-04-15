@@ -39,6 +39,7 @@ export function PropertiesPanel({ getActiveObject, updateStyle }: Props) {
   }, [getActiveObject]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [selectedLayerId, refresh]);
 

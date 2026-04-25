@@ -1,16 +1,29 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { useCanvas } from "@/hooks/useCanvas";
 import { useHistory } from "@/hooks/useHistory";
 import { useAI } from "@/hooks/useAI";
 import { useCanvasStore, CANVAS_FORMATS } from "@/store/canvasStore";
 import { Toolbar } from "./Toolbar";
 import { GenerationOverlay } from "@/components/ai/GenerationOverlay";
+import type { FabricObject } from "fabric";
+import type { ClaudeLayout } from "@/utils/zodSchemas";
 
 type Tool = "select" | "text" | "rect" | "circle" | "triangle" | "image";
 
-export function CanvasEditor() {
+export type CanvasEditorHandle = {
+  exportPNG: () => string;
+  exportJPEG: () => string;
+  getActiveObject: () => FabricObject | null;
+  updateActiveObjectStyle: (styles: Record<string, unknown>) => void;
+  setLayerVisible: (id: string, visible: boolean) => void;
+  setLayerLocked: (id: string, locked: boolean) => void;
+  selectLayerById: (id: string) => void;
+  loadLayout: (layout: ClaudeLayout) => Promise<void>;
+};
+
+export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -28,10 +41,27 @@ export function CanvasEditor() {
     addImage,
     deleteSelected,
     exportPNG,
+    exportJPEG,
+    getActiveObject,
+    updateActiveObjectStyle,
+    setLayerVisible,
+    setLayerLocked,
+    selectLayerById,
   } = useCanvas(canvasRef);
 
   const { undo, redo } = useHistory(loadLayout);
   const { generate } = useAI(fabricRef, loadLayout);
+
+  useImperativeHandle(ref, () => ({
+    exportPNG,
+    exportJPEG,
+    getActiveObject,
+    updateActiveObjectStyle,
+    setLayerVisible,
+    setLayerLocked,
+    selectLayerById,
+    loadLayout,
+  }));
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -87,15 +117,6 @@ export function CanvasEditor() {
     [addImage]
   );
 
-  const handleExport = useCallback(() => {
-    const dataUrl = exportPNG();
-    if (!dataUrl) return;
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = `layra-design-${Date.now()}.png`;
-    a.click();
-  }, [exportPNG]);
-
   // Expose generate for PromptBar (via window event)
   useEffect(() => {
     const onGenerate = (e: Event) => {
@@ -105,13 +126,6 @@ export function CanvasEditor() {
     window.addEventListener("layra:generate", onGenerate);
     return () => window.removeEventListener("layra:generate", onGenerate);
   }, [generate]);
-
-  // Expose export for ExportModal
-  useEffect(() => {
-    const onExport = () => handleExport();
-    window.addEventListener("layra:export-png", onExport);
-    return () => window.removeEventListener("layra:export-png", onExport);
-  }, [handleExport]);
 
   return (
     <div className="flex flex-col h-full bg-zinc-950">
@@ -153,7 +167,6 @@ export function CanvasEditor() {
           ref={containerRef}
           className="flex-1 flex items-center justify-center canvas-workspace overflow-hidden relative"
         >
-          {/* Generation overlay (loading + erreur) */}
           {(isGenerating || generationError) && (
             <GenerationOverlay
               progress={generationProgress}
@@ -162,7 +175,6 @@ export function CanvasEditor() {
             />
           )}
 
-          {/* Canvas wrapper with shadow */}
           <div
             style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}
             className="shadow-2xl shadow-black/50"
@@ -170,7 +182,6 @@ export function CanvasEditor() {
             <canvas ref={canvasRef} />
           </div>
 
-          {/* Scale indicator */}
           <div className="absolute bottom-4 right-4 text-xs text-zinc-600 bg-zinc-900 px-2 py-1 rounded-md">
             {Math.round(scale * 100)}% — {format.width}×{format.height}px
           </div>
@@ -186,4 +197,6 @@ export function CanvasEditor() {
       />
     </div>
   );
-}
+});
+
+CanvasEditor.displayName = "CanvasEditor";

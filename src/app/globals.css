@@ -13,7 +13,9 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background: #030712;
+  background:
+    radial-gradient(ellipse 90% 40% at 50% 0%, rgba(190, 18, 60, 0.07) 0%, transparent 65%),
+    #09090b;
   color: #f9fafb;
   font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
@@ -29,11 +31,23 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #374151;
+  background: #3f3f46;
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+  background: #52525b;
+}
+
+/* Canvas workspace checkerboard */
+.canvas-workspace {
+  background-color: #09090b;
+  background-image:
+    linear-gradient(45deg, #18181b 25%, transparent 25%),
+    linear-gradient(-45deg, #18181b 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #18181b 75%),
+    linear-gradient(-45deg, transparent 75%, #18181b 75%);
+  background-size: 24px 24px;
+  background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
 }
 
 /* Fabric canvas container */
@@ -43,5 +57,5 @@ body {
 
 /* Selection range accent */
 input[type="range"]::-webkit-slider-thumb {
-  accent-color: #6366f1;
+  accent-color: #f43f5e;
 }

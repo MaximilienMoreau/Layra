@@ -36,12 +36,12 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
   }
 
   return (
-    <div className="flex flex-col items-center gap-1 p-2 bg-gray-900 border-r border-gray-800 w-12">
+    <div className="flex flex-col items-center gap-1 p-2 bg-zinc-900 border-r border-zinc-800 w-12">
       {/* Undo/Redo */}
       <button
         onClick={onUndo}
         disabled={historyIndex <= 0}
-        className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         title={`Annuler (Ctrl+Z)${historyIndex > 0 ? ` — étape ${historyIndex + 1}/${historyLength}` : ""}`}
       >
         <Undo2 size={16} />
@@ -49,7 +49,7 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
       <button
         onClick={onRedo}
         disabled={historyIndex >= historyLength - 1}
-        className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         title={`Refaire (Ctrl+Y)${historyIndex < historyLength - 1 ? ` — étape ${historyIndex + 2}/${historyLength}` : ""}`}
       >
         <Redo2 size={16} />
@@ -60,7 +60,7 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
         </span>
       )}
 
-      <div className="w-6 h-px bg-gray-700 my-1" />
+      <div className="w-6 h-px bg-zinc-700 my-1" />
 
       {/* Tools */}
       {tools.map((t) => (
@@ -70,8 +70,8 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
           className={cn(
             "p-2 rounded-lg transition-colors",
             activeTool === t.id
-              ? "bg-indigo-600 text-white"
-              : "text-gray-400 hover:text-white hover:bg-gray-800"
+              ? "bg-rose-600 text-white"
+              : "text-zinc-400 hover:text-white hover:bg-zinc-800"
           )}
           title={t.label}
         >
@@ -79,7 +79,7 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
         </button>
       ))}
 
-      <div className="w-6 h-px bg-gray-700 my-1" />
+      <div className="w-6 h-px bg-zinc-700 my-1" />
 
       <button
         onClick={onDelete}

@@ -14,7 +14,7 @@ export const TEMPLATES: Template[] = [
     id: "instagram-gradient-hero",
     name: "Post Instagram Gradient",
     category: "Instagram",
-    preview: "bg-gradient-to-br from-purple-600 to-pink-600",
+    preview: "bg-gradient-to-br from-orange-500 to-rose-600",
     format: { width: 1080, height: 1080, name: "Instagram carré" },
     layout: {
       layout: "hero",
@@ -120,7 +120,7 @@ export const TEMPLATES: Template[] = [
     id: "linkedin-professional",
     name: "LinkedIn Professionnel",
     category: "LinkedIn",
-    preview: "bg-gradient-to-r from-slate-900 to-blue-900",
+    preview: "bg-gradient-to-r from-zinc-900 to-red-950",
     format: { width: 1200, height: 627, name: "LinkedIn" },
     layout: {
       layout: "split",
@@ -207,7 +207,7 @@ export const TEMPLATES: Template[] = [
     id: "instagram-minimal-dark",
     name: "Minimal Sombre",
     category: "Instagram",
-    preview: "bg-gray-950 border border-gray-800",
+    preview: "bg-zinc-950 border border-zinc-800",
     format: { width: 1080, height: 1080, name: "Instagram carré" },
     layout: {
       layout: "centered",
@@ -416,7 +416,7 @@ export const TEMPLATES: Template[] = [
     id: "youtube-thumbnail",
     name: "Miniature YouTube",
     category: "YouTube",
-    preview: "bg-gradient-to-r from-gray-900 to-gray-800",
+    preview: "bg-gradient-to-r from-zinc-900 to-zinc-800",
     format: { width: 1920, height: 1080, name: "YouTube 16:9" },
     layout: {
       layout: "split",

@@ -8,12 +8,12 @@ const EditorLayout = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-screen items-center justify-center bg-gray-950">
+      <div className="flex h-screen items-center justify-center bg-zinc-950">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center animate-pulse">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-rose-600 flex items-center justify-center animate-pulse">
             <Zap size={20} className="text-white" />
           </div>
-          <p className="text-gray-500 text-sm">Chargement de Layra…</p>
+          <p className="text-zinc-500 text-sm">Chargement de Layra…</p>
         </div>
       </div>
     ),

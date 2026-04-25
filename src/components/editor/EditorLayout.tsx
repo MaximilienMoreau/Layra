@@ -86,21 +86,21 @@ export function EditorLayout() {
   ];
 
   return (
-    <div className="flex flex-col h-screen bg-gray-950 text-white overflow-hidden">
+    <div className="flex flex-col h-screen bg-zinc-950 text-white overflow-hidden">
       {/* Top Nav */}
-      <header className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800 shrink-0 z-10">
+      <header className="flex items-center justify-between px-4 py-2 bg-zinc-900 border-b border-zinc-800 shrink-0 z-10">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-orange-500 to-rose-600 flex items-center justify-center">
               <Zap size={14} className="text-white" />
             </div>
             <span className="font-bold text-white tracking-tight">Layra</span>
           </div>
 
-          <div className="w-px h-4 bg-gray-700" />
+          <div className="w-px h-4 bg-zinc-700" />
 
           {/* View switcher */}
-          <div className="flex gap-1 bg-gray-800 rounded-lg p-0.5">
+          <div className="flex gap-1 bg-zinc-800 rounded-lg p-0.5">
             {(["canvas", "templates"] as const).map((v) => (
               <button
                 key={v}
@@ -108,8 +108,8 @@ export function EditorLayout() {
                 className={cn(
                   "text-xs px-3 py-1 rounded-md transition-colors capitalize",
                   activeView === v
-                    ? "bg-gray-700 text-white"
-                    : "text-gray-500 hover:text-gray-300"
+                    ? "bg-zinc-700 text-white"
+                    : "text-zinc-500 hover:text-zinc-300"
                 )}
               >
                 {v === "canvas" ? "Éditeur" : "Templates"}
@@ -120,12 +120,12 @@ export function EditorLayout() {
 
         <div className="flex items-center gap-3">
           {/* Brand indicator */}
-          <div className="hidden md:flex items-center gap-2 text-xs text-gray-500">
+          <div className="hidden md:flex items-center gap-2 text-xs text-zinc-500">
             <div className="flex gap-1">
               {activeBrand.colors.slice(0, 3).map((c, i) => (
                 <div
                   key={i}
-                  className="w-3 h-3 rounded-full border border-gray-700"
+                  className="w-3 h-3 rounded-full border border-zinc-700"
                   style={{ backgroundColor: c }}
                 />
               ))}
@@ -134,9 +134,9 @@ export function EditorLayout() {
           </div>
 
           {/* Credits */}
-          <div className="flex items-center gap-1.5 bg-gray-800 rounded-lg px-2.5 py-1.5">
+          <div className="flex items-center gap-1.5 bg-zinc-800 rounded-lg px-2.5 py-1.5">
             <Coins size={13} className={credits < 50 ? "text-red-400" : "text-amber-400"} />
-            <span className={cn("text-xs font-medium", credits < 50 ? "text-red-400" : "text-gray-300")}>
+            <span className={cn("text-xs font-medium", credits < 50 ? "text-red-400" : "text-zinc-300")}>
               {credits}
             </span>
           </div>
@@ -144,7 +144,7 @@ export function EditorLayout() {
           {/* Export */}
           <button
             onClick={() => setShowExport(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 rounded-lg text-xs font-medium transition-colors"
           >
             <Download size={14} />
             Exporter
@@ -157,13 +157,13 @@ export function EditorLayout() {
         {/* Left panel */}
         {activeView === "canvas" && (
           <div className={cn(
-            "flex shrink-0 border-r border-gray-800 bg-gray-900 transition-all duration-200",
+            "flex shrink-0 border-r border-zinc-800 bg-zinc-900 transition-all duration-200",
             leftOpen ? "w-56" : "w-12"
           )}>
             {leftOpen ? (
               <div className="flex flex-col w-full">
                 {/* Tabs */}
-                <div className="flex border-b border-gray-800">
+                <div className="flex border-b border-zinc-800">
                   {leftTabs.map((t) => (
                     <button
                       key={t.id}
@@ -171,8 +171,8 @@ export function EditorLayout() {
                       className={cn(
                         "flex-1 flex flex-col items-center gap-0.5 py-2 text-xs transition-colors",
                         leftTab === t.id
-                          ? "text-indigo-400 border-b-2 border-indigo-500"
-                          : "text-gray-500 hover:text-gray-300"
+                          ? "text-rose-400 border-b-2 border-rose-500"
+                          : "text-zinc-500 hover:text-zinc-300"
                       )}
                     >
                       <t.icon size={14} />
@@ -181,7 +181,7 @@ export function EditorLayout() {
                   ))}
                   <button
                     onClick={() => setLeftOpen(false)}
-                    className="px-2 text-gray-600 hover:text-gray-400"
+                    className="px-2 text-zinc-600 hover:text-zinc-400"
                   >
                     <ChevronLeft size={14} />
                   </button>
@@ -197,10 +197,10 @@ export function EditorLayout() {
                   {leftTab === "brand" && <BrandKitPanel />}
                   {leftTab === "templates" && (
                     <div className="p-2">
-                      <p className="text-xs text-gray-500 mb-2">Ouvrez la vue Templates</p>
+                      <p className="text-xs text-zinc-500 mb-2">Ouvrez la vue Templates</p>
                       <button
                         onClick={() => setActiveView("templates")}
-                        className="w-full text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1.5 rounded-md text-gray-400 hover:text-white transition-colors"
+                        className="w-full text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1.5 rounded-md text-zinc-400 hover:text-white transition-colors"
                       >
                         Voir tous les templates →
                       </button>
@@ -212,7 +212,7 @@ export function EditorLayout() {
               <div className="flex flex-col items-center gap-2 py-2 w-full">
                 <button
                   onClick={() => setLeftOpen(true)}
-                  className="text-gray-600 hover:text-gray-400 p-1"
+                  className="text-zinc-600 hover:text-zinc-400 p-1"
                 >
                   <ChevronRight size={14} />
                 </button>
@@ -220,7 +220,7 @@ export function EditorLayout() {
                   <button
                     key={t.id}
                     onClick={() => { setLeftTab(t.id); setLeftOpen(true); }}
-                    className="p-2 text-gray-600 hover:text-gray-400 transition-colors"
+                    className="p-2 text-zinc-600 hover:text-zinc-400 transition-colors"
                     title={t.label}
                   >
                     <t.icon size={16} />
@@ -248,21 +248,21 @@ export function EditorLayout() {
         {/* Right panel */}
         {activeView === "canvas" && (
           <div className={cn(
-            "flex shrink-0 border-l border-gray-800 bg-gray-900 transition-all duration-200",
+            "flex shrink-0 border-l border-zinc-800 bg-zinc-900 transition-all duration-200",
             rightOpen ? "w-56" : "w-12"
           )}>
             {rightOpen ? (
               <div className="flex flex-col w-full">
-                <div className="flex items-center border-b border-gray-800 px-1">
+                <div className="flex items-center border-b border-zinc-800 px-1">
                   <div className="flex-1 flex">
-                    <button className="flex-1 flex flex-col items-center gap-0.5 py-2 text-xs text-indigo-400 border-b-2 border-indigo-500">
+                    <button className="flex-1 flex flex-col items-center gap-0.5 py-2 text-xs text-rose-400 border-b-2 border-rose-500">
                       <Settings2 size={14} />
                       <span className="text-[10px]">Propriétés</span>
                     </button>
                   </div>
                   <button
                     onClick={() => setRightOpen(false)}
-                    className="px-2 text-gray-600 hover:text-gray-400"
+                    className="px-2 text-zinc-600 hover:text-zinc-400"
                   >
                     <ChevronRight size={14} />
                   </button>
@@ -278,13 +278,13 @@ export function EditorLayout() {
               <div className="flex flex-col items-center gap-2 py-2 w-full">
                 <button
                   onClick={() => setRightOpen(true)}
-                  className="text-gray-600 hover:text-gray-400 p-1"
+                  className="text-zinc-600 hover:text-zinc-400 p-1"
                 >
                   <ChevronLeft size={14} />
                 </button>
                 <button
                   onClick={() => setRightOpen(true)}
-                  className="p-2 text-gray-600 hover:text-gray-400"
+                  className="p-2 text-zinc-600 hover:text-zinc-400"
                   title="Propriétés"
                 >
                   <Settings2 size={16} />

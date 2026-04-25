@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { useCanvas } from "@/hooks/useCanvas";
 import { useHistory } from "@/hooks/useHistory";
 import { useCanvasStore } from "@/store/canvasStore";
@@ -14,6 +14,7 @@ import { BrandKitPanel } from "@/components/brand/BrandKitPanel";
 import { TemplateGallery } from "@/components/templates/TemplateGallery";
 import { ExportModal } from "@/components/export/ExportModal";
 import { useAI } from "@/hooks/useAI";
+import { useThemeStore } from "@/store/themeStore";
 import type { Template } from "@/components/templates/templates";
 import {
   Layers,
@@ -25,6 +26,8 @@ import {
   Coins,
   ChevronLeft,
   ChevronRight,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +45,11 @@ export function EditorLayout() {
   const { activeView, setActiveView } = useCanvasStore();
   const { activeBrand } = useBrandStore();
   const { credits } = useCreditsStore();
+  const { isDark, toggle: toggleTheme } = useThemeStore();
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("light", !isDark);
+  }, [isDark]);
 
   const {
     fabricRef,
@@ -62,14 +70,10 @@ export function EditorLayout() {
   const { undo, redo } = useHistory(loadLayout);
   const { generate } = useAI(fabricRef, loadLayout);
 
-  // Expose generate via custom event for PromptBar
   const handleGenerate = useCallback(
     (prompt: string, reprompt: boolean) => generate(prompt, reprompt),
     [generate]
   );
-
-  // Listen for events from CanvasEditor's generate button
-  // (PromptBar already dispatches these)
 
   const handleApplyTemplate = useCallback(
     async (template: Template) => {
@@ -140,6 +144,15 @@ export function EditorLayout() {
               {credits}
             </span>
           </div>
+
+          {/* Day / Night toggle */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+            title={isDark ? "Mode diurne" : "Mode nocturne"}
+          >
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
 
           {/* Export */}
           <button

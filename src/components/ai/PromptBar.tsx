@@ -10,6 +10,7 @@ const SUGGESTIONS = [
   "Un post Instagram pour un café artisanal, ambiance chaleureuse",
   "Une pub LinkedIn pour une startup tech, style minimaliste",
   "Un visuel motivant pour Instagram, couleurs vives",
+  "Une bannière YouTube pour une chaîne gaming, esthétique néon sombre",
   "Une annonce de lancement de produit, style premium",
   "Une story Instagram pour une vente flash",
 ];
@@ -18,10 +19,10 @@ export function PromptBar() {
   const [prompt, setPrompt] = useState("");
   const [isReprompt, setIsReprompt] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { isGenerating, elements } = useCanvasStore();
+  const { isGenerating, layers } = useCanvasStore();
   const { credits, canUse } = useCreditsStore();
 
-  const hasCanvas = elements.length > 0;
+  const hasCanvas = layers.length > 0;
   const canGenerate = canUse("generate_design") && !isGenerating && prompt.trim().length > 3;
 
   function handleSubmit() {
@@ -46,24 +47,23 @@ export function PromptBar() {
   }
 
   return (
-    <div className="relative">
-      {/* Suggestions (shown when empty) */}
-      {prompt.length === 0 && !isGenerating && (
-        <div className="absolute bottom-full mb-2 left-0 right-0 flex flex-wrap gap-1.5 px-4 pb-1">
-          {SUGGESTIONS.slice(0, 3).map((s) => (
-            <button
-              key={s}
-              onClick={() => applySuggestion(s)}
-              className="text-xs bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700 text-zinc-400 hover:text-white px-3 py-1.5 rounded-full transition-colors backdrop-blur-sm whitespace-nowrap"
-            >
-              {s.length > 50 ? s.slice(0, 47) + "..." : s}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Main prompt bar */}
+    <div>
       <div className="bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3">
+        {/* Suggestions (shown when empty) */}
+        {prompt.length === 0 && !isGenerating && (
+          <div className="flex flex-wrap gap-1.5 mb-3 max-w-4xl mx-auto">
+            {SUGGESTIONS.slice(0, 4).map((s) => (
+              <button
+                key={s}
+                onClick={() => applySuggestion(s)}
+                className="text-xs bg-zinc-800 hover:bg-rose-950/60 border border-zinc-700 hover:border-rose-800 text-zinc-400 hover:text-rose-200 px-3 py-1.5 rounded-full transition-colors"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-end gap-3 max-w-4xl mx-auto">
           {/* Mode toggle (new vs reprompt) */}
           {hasCanvas && (
@@ -141,7 +141,7 @@ export function PromptBar() {
 
         {/* Credits indicator */}
         <div className="flex justify-center mt-1.5">
-          <span className="text-xs text-zinc-600">
+          <span className="text-xs">
             <span className={credits < 50 ? "text-red-400" : "text-zinc-500"}>
               {credits} crédits
             </span>

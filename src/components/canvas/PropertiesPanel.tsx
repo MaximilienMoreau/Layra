@@ -114,8 +114,8 @@ export function PropertiesPanel({ getActiveObject, updateStyle }: Props) {
           <div className="flex items-center gap-2">
             <input
               type="color"
-              value={(isText ? props.fill : props.fill) as string || "#ffffff"}
-              onChange={(e) => update(isText ? "fill" : "fill", e.target.value)}
+              value={(props.fill as string) || "#ffffff"}
+              onChange={(e) => update("fill", e.target.value)}
               className="w-8 h-8 rounded cursor-pointer border border-zinc-700 bg-zinc-800"
             />
             <input

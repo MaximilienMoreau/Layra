@@ -10,6 +10,7 @@ const SUGGESTIONS = [
   "Un post Instagram pour un café artisanal, ambiance chaleureuse",
   "Une pub LinkedIn pour une startup tech, style minimaliste",
   "Un visuel motivant pour Instagram, couleurs vives",
+  "Une bannière YouTube pour une chaîne gaming, esthétique néon sombre",
   "Une annonce de lancement de produit, style premium",
   "Une story Instagram pour une vente flash",
 ];
@@ -18,10 +19,10 @@ export function PromptBar() {
   const [prompt, setPrompt] = useState("");
   const [isReprompt, setIsReprompt] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { isGenerating, elements } = useCanvasStore();
+  const { isGenerating, layers } = useCanvasStore();
   const { credits, canUse } = useCreditsStore();
 
-  const hasCanvas = elements.length > 0;
+  const hasCanvas = layers.length > 0;
   const canGenerate = canUse("generate_design") && !isGenerating && prompt.trim().length > 3;
 
   function handleSubmit() {
@@ -46,33 +47,32 @@ export function PromptBar() {
   }
 
   return (
-    <div className="relative">
-      {/* Suggestions (shown when empty) */}
-      {prompt.length === 0 && !isGenerating && (
-        <div className="absolute bottom-full mb-2 left-0 right-0 flex flex-wrap gap-1.5 px-4 pb-1">
-          {SUGGESTIONS.slice(0, 3).map((s) => (
-            <button
-              key={s}
-              onClick={() => useSuggestion(s)}
-              className="text-xs bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-gray-400 hover:text-white px-3 py-1.5 rounded-full transition-colors backdrop-blur-sm whitespace-nowrap"
-            >
-              {s.length > 50 ? s.slice(0, 47) + "..." : s}
-            </button>
-          ))}
-        </div>
-      )}
+    <div>
+      <div className="bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3">
+        {/* Suggestions (shown when empty) */}
+        {prompt.length === 0 && !isGenerating && (
+          <div className="flex flex-wrap gap-1.5 mb-3 max-w-4xl mx-auto">
+            {SUGGESTIONS.slice(0, 4).map((s) => (
+              <button
+                key={s}
+                onClick={() => useSuggestion(s)}
+                className="text-xs bg-zinc-800 hover:bg-rose-950/60 border border-zinc-700 hover:border-rose-800 text-zinc-400 hover:text-rose-200 px-3 py-1.5 rounded-full transition-colors"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
 
-      {/* Main prompt bar */}
-      <div className="bg-gray-900/95 backdrop-blur-md border-t border-gray-800 px-4 py-3">
         <div className="flex items-end gap-3 max-w-4xl mx-auto">
           {/* Mode toggle (new vs reprompt) */}
           {hasCanvas && (
-            <div className="flex bg-gray-800 rounded-lg p-0.5 shrink-0 self-end mb-0.5">
+            <div className="flex bg-zinc-800 rounded-lg p-0.5 shrink-0 self-end mb-0.5">
               <button
                 onClick={() => setIsReprompt(false)}
                 className={cn(
                   "text-xs px-2 py-1 rounded-md transition-colors",
-                  !isReprompt ? "bg-indigo-600 text-white" : "text-gray-400 hover:text-white"
+                  !isReprompt ? "bg-rose-600 text-white" : "text-zinc-400 hover:text-white"
                 )}
               >
                 Nouveau
@@ -81,7 +81,7 @@ export function PromptBar() {
                 onClick={() => setIsReprompt(true)}
                 className={cn(
                   "text-xs px-2 py-1 rounded-md transition-colors",
-                  isReprompt ? "bg-indigo-600 text-white" : "text-gray-400 hover:text-white"
+                  isReprompt ? "bg-rose-600 text-white" : "text-zinc-400 hover:text-white"
                 )}
               >
                 <RefreshCw size={11} className="inline mr-1" />
@@ -92,7 +92,7 @@ export function PromptBar() {
 
           {/* Textarea */}
           <div className="flex-1 relative">
-            <div className="absolute left-3 top-2.5 text-indigo-400">
+            <div className="absolute left-3 top-2.5 text-rose-400">
               <Sparkles size={16} />
             </div>
             <textarea
@@ -107,7 +107,7 @@ export function PromptBar() {
               }
               disabled={isGenerating}
               rows={1}
-              className="w-full pl-9 pr-4 py-2.5 bg-gray-800 border border-gray-700 focus:border-indigo-500 rounded-xl text-sm text-white placeholder-gray-500 resize-none outline-none transition-colors disabled:opacity-50"
+              className="w-full pl-9 pr-4 py-2.5 bg-zinc-800 border border-zinc-700 focus:border-rose-500 rounded-xl text-sm text-white placeholder-zinc-500 resize-none outline-none transition-colors disabled:opacity-50"
               style={{ minHeight: "42px", maxHeight: "120px" }}
               onInput={(e) => {
                 const t = e.target as HTMLTextAreaElement;
@@ -124,8 +124,8 @@ export function PromptBar() {
             className={cn(
               "shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
               canGenerate
-                ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-900/50"
-                : "bg-gray-800 text-gray-600 cursor-not-allowed"
+                ? "bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/50"
+                : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
             )}
           >
             {isGenerating ? (
@@ -141,11 +141,11 @@ export function PromptBar() {
 
         {/* Credits indicator */}
         <div className="flex justify-center mt-1.5">
-          <span className="text-xs text-gray-600">
-            <span className={credits < 50 ? "text-red-400" : "text-gray-500"}>
+          <span className="text-xs">
+            <span className={credits < 50 ? "text-red-400" : "text-zinc-500"}>
               {credits} crédits
             </span>
-            <span className="text-gray-700"> · {CREDIT_COSTS.generate_design} crédits/génération</span>
+            <span className="text-zinc-700"> · {CREDIT_COSTS.generate_design} crédits/génération</span>
           </span>
         </div>
       </div>

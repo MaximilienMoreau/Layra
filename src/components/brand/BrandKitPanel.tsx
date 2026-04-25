@@ -31,18 +31,18 @@ export function BrandKitPanel() {
 
   return (
     <div className="flex flex-col gap-4 p-3 overflow-y-auto h-full">
-      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+      <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
         Brand Kit
       </h3>
 
       {/* Brand name */}
       <section className="flex flex-col gap-2">
-        <label className="text-xs text-gray-500">Nom de la marque</label>
+        <label className="text-xs text-zinc-500">Nom de la marque</label>
         <input
           type="text"
           value={activeBrand.name}
           onChange={(e) => updateActiveBrand({ name: e.target.value })}
-          className="bg-gray-800 border border-gray-700 rounded-md px-2 py-1.5 text-sm text-white w-full outline-none focus:border-indigo-500"
+          className="bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1.5 text-sm text-white w-full outline-none focus:border-rose-500"
         />
       </section>
 
@@ -53,8 +53,8 @@ export function BrandKitPanel() {
           className={cn(
             "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors border",
             activeBrand.locked
-              ? "bg-indigo-900/40 border-indigo-700 text-indigo-300"
-              : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white"
+              ? "bg-rose-900/40 border-rose-700 text-rose-300"
+              : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-white"
           )}
         >
           {activeBrand.locked ? <Lock size={14} /> : <Unlock size={14} />}
@@ -67,7 +67,7 @@ export function BrandKitPanel() {
 
       {/* Colors */}
       <section className="flex flex-col gap-2">
-        <div className="flex items-center gap-1 text-xs text-gray-500">
+        <div className="flex items-center gap-1 text-xs text-zinc-500">
           <Palette size={12} />
           <span>Palette ({activeBrand.colors.length}/5)</span>
         </div>
@@ -78,17 +78,17 @@ export function BrandKitPanel() {
                 type="color"
                 value={color}
                 onChange={(e) => updateColor(idx, e.target.value)}
-                className="w-7 h-7 rounded cursor-pointer border border-gray-700 bg-gray-800"
+                className="w-7 h-7 rounded cursor-pointer border border-zinc-700 bg-zinc-800"
               />
               <input
                 type="text"
                 value={color}
                 onChange={(e) => updateColor(idx, e.target.value)}
-                className="flex-1 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white font-mono"
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-xs text-white font-mono"
               />
               <button
                 onClick={() => removeColor(idx)}
-                className="text-gray-600 hover:text-red-400 transition-colors text-xs px-1"
+                className="text-zinc-600 hover:text-red-400 transition-colors text-xs px-1"
               >
                 ×
               </button>
@@ -101,11 +101,11 @@ export function BrandKitPanel() {
               type="color"
               value={newColor}
               onChange={(e) => setNewColor(e.target.value)}
-              className="w-7 h-7 rounded cursor-pointer border border-gray-700 bg-gray-800"
+              className="w-7 h-7 rounded cursor-pointer border border-zinc-700 bg-zinc-800"
             />
             <button
               onClick={addColor}
-              className="flex-1 text-xs bg-gray-800 hover:bg-gray-700 border border-dashed border-gray-700 rounded px-2 py-1 text-gray-400 hover:text-white transition-colors"
+              className="flex-1 text-xs bg-zinc-800 hover:bg-zinc-700 border border-dashed border-zinc-700 rounded px-2 py-1 text-zinc-400 hover:text-white transition-colors"
             >
               + Ajouter
             </button>
@@ -115,31 +115,31 @@ export function BrandKitPanel() {
 
       {/* Fonts */}
       <section className="flex flex-col gap-2">
-        <div className="flex items-center gap-1 text-xs text-gray-500">
+        <div className="flex items-center gap-1 text-xs text-zinc-500">
           <Type size={12} />
           <span>Typographies</span>
         </div>
         <div className="flex flex-col gap-2">
           <div>
-            <label className="text-xs text-gray-600 mb-1 block">Titres</label>
+            <label className="text-xs text-zinc-600 mb-1 block">Titres</label>
             <select
               value={activeBrand.fonts.heading}
               onChange={(e) =>
                 updateActiveBrand({ fonts: { ...activeBrand.fonts, heading: e.target.value } })
               }
-              className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs text-white"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs text-white"
             >
               {GOOGLE_FONTS.map((f) => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-600 mb-1 block">Corps</label>
+            <label className="text-xs text-zinc-600 mb-1 block">Corps</label>
             <select
               value={activeBrand.fonts.body}
               onChange={(e) =>
                 updateActiveBrand({ fonts: { ...activeBrand.fonts, body: e.target.value } })
               }
-              className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs text-white"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs text-white"
             >
               {GOOGLE_FONTS.map((f) => <option key={f} value={f}>{f}</option>)}
             </select>
@@ -149,9 +149,9 @@ export function BrandKitPanel() {
 
       {/* Logo */}
       <section className="flex flex-col gap-2">
-        <label className="text-xs text-gray-500">Logo</label>
+        <label className="text-xs text-zinc-500">Logo</label>
         {activeBrand.logoUrl ? (
-          <div className="relative bg-gray-800 rounded-lg p-2 border border-gray-700">
+          <div className="relative bg-zinc-800 rounded-lg p-2 border border-zinc-700">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={activeBrand.logoUrl}
@@ -160,15 +160,15 @@ export function BrandKitPanel() {
             />
             <button
               onClick={() => updateActiveBrand({ logoUrl: null })}
-              className="absolute top-1 right-1 text-gray-600 hover:text-red-400 text-xs"
+              className="absolute top-1 right-1 text-zinc-600 hover:text-red-400 text-xs"
             >
               ×
             </button>
           </div>
         ) : (
-          <label className="flex flex-col items-center gap-2 p-3 bg-gray-800 border border-dashed border-gray-700 rounded-lg cursor-pointer hover:border-indigo-600 transition-colors">
-            <Upload size={16} className="text-gray-500" />
-            <span className="text-xs text-gray-500">Importer PNG/SVG</span>
+          <label className="flex flex-col items-center gap-2 p-3 bg-zinc-800 border border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-rose-600 transition-colors">
+            <Upload size={16} className="text-zinc-500" />
+            <span className="text-xs text-zinc-500">Importer PNG/SVG</span>
             <input
               type="file"
               accept="image/png,image/svg+xml"

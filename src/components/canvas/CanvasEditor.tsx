@@ -113,18 +113,18 @@ export function CanvasEditor() {
   }, [handleExport]);
 
   return (
-    <div className="flex flex-col h-full bg-gray-950">
+    <div className="flex flex-col h-full bg-zinc-950">
       {/* Format selector bar */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-gray-900 border-b border-gray-800 overflow-x-auto">
-        <span className="text-xs text-gray-500 shrink-0">Format :</span>
+      <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border-b border-zinc-800 overflow-x-auto">
+        <span className="text-xs text-zinc-500 shrink-0">Format :</span>
         {CANVAS_FORMATS.map((f) => (
           <button
             key={f.name}
             onClick={() => setFormat(f)}
             className={`text-xs px-3 py-1 rounded-full whitespace-nowrap transition-colors ${
               format.name === f.name
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+                ? "bg-rose-600 text-white"
+                : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
             }`}
           >
             {f.name}
@@ -148,16 +148,16 @@ export function CanvasEditor() {
         {/* Canvas container */}
         <div
           ref={containerRef}
-          className="flex-1 flex items-center justify-center bg-gray-950 overflow-hidden relative"
+          className="flex-1 flex items-center justify-center bg-zinc-950 overflow-hidden relative"
         >
           {/* Loading overlay */}
           {isGenerating && (
-            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-950/80 backdrop-blur-sm">
-              <div className="flex flex-col items-center gap-4 bg-gray-900 rounded-2xl p-8 border border-gray-700 shadow-2xl max-w-sm mx-4">
-                <Loader2 className="text-indigo-500 animate-spin" size={40} />
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950/80 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-4 bg-zinc-900 rounded-2xl p-8 border border-zinc-700 shadow-2xl max-w-sm mx-4">
+                <Loader2 className="text-rose-500 animate-spin" size={40} />
                 <p className="text-white font-medium text-center">{generationProgress}</p>
-                <div className="w-48 h-1 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-indigo-500 rounded-full animate-pulse w-3/4" />
+                <div className="w-48 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-rose-500 rounded-full animate-pulse w-3/4" />
                 </div>
               </div>
             </div>
@@ -172,7 +172,7 @@ export function CanvasEditor() {
           </div>
 
           {/* Scale indicator */}
-          <div className="absolute bottom-4 right-4 text-xs text-gray-600 bg-gray-900 px-2 py-1 rounded-md">
+          <div className="absolute bottom-4 right-4 text-xs text-zinc-600 bg-zinc-900 px-2 py-1 rounded-md">
             {Math.round(scale * 100)}% — {format.width}×{format.height}px
           </div>
         </div>

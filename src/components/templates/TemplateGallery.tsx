@@ -21,18 +21,18 @@ export function TemplateGallery({ onApply }: Props) {
     : TEMPLATES.filter((t) => t.category === activeCategory);
 
   return (
-    <div className="flex flex-col h-full bg-gray-950">
+    <div className="flex flex-col h-full bg-zinc-950">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 border-b border-gray-800">
+      <div className="px-6 pt-6 pb-4 border-b border-zinc-800">
         <div className="flex items-center gap-2 mb-1">
-          <LayoutTemplate size={20} className="text-indigo-400" />
+          <LayoutTemplate size={20} className="text-rose-400" />
           <h2 className="text-lg font-semibold text-white">Templates</h2>
         </div>
-        <p className="text-sm text-gray-500">Choisissez un point de départ, puis personnalisez</p>
+        <p className="text-sm text-zinc-500">Choisissez un point de départ, puis personnalisez</p>
       </div>
 
       {/* Category filter */}
-      <div className="flex gap-2 px-6 py-3 overflow-x-auto border-b border-gray-800">
+      <div className="flex gap-2 px-6 py-3 overflow-x-auto border-b border-zinc-800">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
@@ -40,8 +40,8 @@ export function TemplateGallery({ onApply }: Props) {
             className={cn(
               "text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-colors",
               activeCategory === cat
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+                ? "bg-rose-600 text-white"
+                : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
             )}
           >
             {cat}
@@ -55,7 +55,7 @@ export function TemplateGallery({ onApply }: Props) {
           {filtered.map((template) => (
             <div
               key={template.id}
-              className="group relative bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-indigo-600 transition-all cursor-pointer"
+              className="group relative bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 hover:border-rose-600 transition-all cursor-pointer"
               onClick={() => {
                 onApply(template);
                 setActiveView("canvas");
@@ -74,8 +74,8 @@ export function TemplateGallery({ onApply }: Props) {
                   </p>
                 </div>
                 {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-indigo-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <div className="flex items-center gap-1 bg-white text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+                <div className="absolute inset-0 bg-rose-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="flex items-center gap-1 bg-white text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-full">
                     Utiliser
                     <ChevronRight size={12} />
                   </div>
@@ -86,8 +86,8 @@ export function TemplateGallery({ onApply }: Props) {
               <div className="p-3">
                 <p className="text-xs font-medium text-white truncate">{template.name}</p>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-gray-500">{template.category}</span>
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-zinc-500">{template.category}</span>
+                  <span className="text-xs text-zinc-600">
                     {template.format.width}×{template.format.height}
                   </span>
                 </div>

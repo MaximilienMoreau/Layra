@@ -1,24 +1,45 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { useCanvas } from "@/hooks/useCanvas";
 import { useHistory } from "@/hooks/useHistory";
 import { useAI } from "@/hooks/useAI";
 import { useCanvasStore, CANVAS_FORMATS } from "@/store/canvasStore";
 import { Toolbar } from "./Toolbar";
 import { GenerationOverlay } from "@/components/ai/GenerationOverlay";
+import type { FabricObject } from "fabric";
+import type { ClaudeLayout } from "@/utils/zodSchemas";
 
 type Tool = "select" | "text" | "rect" | "circle" | "triangle" | "image";
 
-export function CanvasEditor() {
+export type CanvasEditorHandle = {
+  exportPNG: () => string;
+  exportJPEG: () => string;
+  getActiveObject: () => FabricObject | null;
+  updateActiveObjectStyle: (styles: Record<string, unknown>) => void;
+  setLayerVisible: (id: string, visible: boolean) => void;
+  setLayerLocked: (id: string, locked: boolean) => void;
+  selectLayerById: (id: string) => void;
+  loadLayout: (layout: ClaudeLayout) => Promise<void>;
+};
+
+export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTool, setActiveTool] = useState<Tool>("select");
   const [scale, setScale] = useState(0.4);
 
-  const { format, isGenerating, generationProgress, generationError, historyIndex, history, setFormat, setGenerationError } =
-    useCanvasStore();
+  const {
+    format,
+    isGenerating,
+    generationProgress,
+    generationError,
+    historyIndex,
+    history,
+    setFormat,
+    setGenerationError,
+  } = useCanvasStore();
 
   const {
     fabricRef,
@@ -28,17 +49,32 @@ export function CanvasEditor() {
     addImage,
     deleteSelected,
     exportPNG,
+    exportJPEG,
+    getActiveObject,
+    updateActiveObjectStyle,
+    setLayerVisible,
+    setLayerLocked,
+    selectLayerById,
   } = useCanvas(canvasRef);
 
   const { undo, redo } = useHistory(loadLayout);
   const { generate } = useAI(fabricRef, loadLayout);
 
-  // Keyboard shortcuts
+  useImperativeHandle(ref, () => ({
+    exportPNG,
+    exportJPEG,
+    getActiveObject,
+    updateActiveObjectStyle,
+    setLayerVisible,
+    setLayerLocked,
+    selectLayerById,
+    loadLayout,
+  }));
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
-
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
         e.preventDefault();
         if (e.shiftKey) redo();
@@ -48,23 +84,18 @@ export function CanvasEditor() {
         e.preventDefault();
         redo();
       }
-      if (e.key === "Delete" || e.key === "Backspace") {
-        deleteSelected();
-      }
+      if (e.key === "Delete" || e.key === "Backspace") deleteSelected();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [undo, redo, deleteSelected]);
 
-  // Auto-scale canvas to fit container
   useEffect(() => {
     const updateScale = () => {
       if (!containerRef.current) return;
       const { width, height } = containerRef.current.getBoundingClientRect();
       const padding = 80;
-      const scaleX = (width - padding) / format.width;
-      const scaleY = (height - padding) / format.height;
-      setScale(Math.min(scaleX, scaleY, 1));
+      setScale(Math.min((width - padding) / format.width, (height - padding) / format.height, 1));
     };
     updateScale();
     const observer = new ResizeObserver(updateScale);
@@ -72,31 +103,18 @@ export function CanvasEditor() {
     return () => observer.disconnect();
   }, [format]);
 
-  const handleAddImage = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
+  const handleAddImage = useCallback(() => fileInputRef.current?.click(), []);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const url = URL.createObjectURL(file);
-      await addImage(url);
+      await addImage(URL.createObjectURL(file));
       setActiveTool("select");
     },
     [addImage]
   );
 
-  const handleExport = useCallback(() => {
-    const dataUrl = exportPNG();
-    if (!dataUrl) return;
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = `layra-design-${Date.now()}.png`;
-    a.click();
-  }, [exportPNG]);
-
-  // Expose generate for PromptBar (via window event)
   useEffect(() => {
     const onGenerate = (e: Event) => {
       const ce = e as CustomEvent<{ prompt: string; reprompt: boolean }>;
@@ -106,16 +124,8 @@ export function CanvasEditor() {
     return () => window.removeEventListener("layra:generate", onGenerate);
   }, [generate]);
 
-  // Expose export for ExportModal
-  useEffect(() => {
-    const onExport = () => handleExport();
-    window.addEventListener("layra:export-png", onExport);
-    return () => window.removeEventListener("layra:export-png", onExport);
-  }, [handleExport]);
-
   return (
     <div className="flex flex-col h-full bg-zinc-950">
-      {/* Format selector bar */}
       <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border-b border-zinc-800 overflow-x-auto">
         <span className="text-xs text-zinc-500 shrink-0">Format :</span>
         {CANVAS_FORMATS.map((f) => (
@@ -133,7 +143,6 @@ export function CanvasEditor() {
         ))}
       </div>
 
-      {/* Main editor area */}
       <div className="flex flex-1 overflow-hidden">
         <Toolbar
           activeTool={activeTool}
@@ -148,12 +157,10 @@ export function CanvasEditor() {
           historyLength={history.length}
         />
 
-        {/* Canvas container */}
         <div
           ref={containerRef}
           className="flex-1 flex items-center justify-center canvas-workspace overflow-hidden relative"
         >
-          {/* Generation overlay (loading + erreur) */}
           {(isGenerating || generationError) && (
             <GenerationOverlay
               progress={generationProgress}
@@ -162,7 +169,6 @@ export function CanvasEditor() {
             />
           )}
 
-          {/* Canvas wrapper with shadow */}
           <div
             style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}
             className="shadow-2xl shadow-black/50"
@@ -170,7 +176,6 @@ export function CanvasEditor() {
             <canvas ref={canvasRef} />
           </div>
 
-          {/* Scale indicator */}
           <div className="absolute bottom-4 right-4 text-xs text-zinc-600 bg-zinc-900 px-2 py-1 rounded-md">
             {Math.round(scale * 100)}% — {format.width}×{format.height}px
           </div>
@@ -186,4 +191,6 @@ export function CanvasEditor() {
       />
     </div>
   );
-}
+});
+
+CanvasEditor.displayName = "CanvasEditor";

@@ -1,19 +1,16 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import { useCanvas } from "@/hooks/useCanvas";
-import { useHistory } from "@/hooks/useHistory";
 import { useCanvasStore } from "@/store/canvasStore";
 import { useBrandStore } from "@/store/brandStore";
 import { useCreditsStore } from "@/store/creditsStore";
-import { CanvasEditor } from "@/components/canvas/CanvasEditor";
+import { CanvasEditor, type CanvasEditorHandle } from "@/components/canvas/CanvasEditor";
 import { LayerPanel } from "@/components/canvas/LayerPanel";
 import { PropertiesPanel } from "@/components/canvas/PropertiesPanel";
 import { PromptBar } from "@/components/ai/PromptBar";
 import { BrandKitPanel } from "@/components/brand/BrandKitPanel";
 import { TemplateGallery } from "@/components/templates/TemplateGallery";
 import { ExportModal } from "@/components/export/ExportModal";
-import { useAI } from "@/hooks/useAI";
 import { useThemeStore } from "@/store/themeStore";
 import type { Template } from "@/components/templates/templates";
 import {
@@ -32,12 +29,11 @@ import {
 import { cn } from "@/lib/utils";
 
 type LeftTab = "layers" | "brand" | "templates";
-type RightTab = "properties";
 
 export function EditorLayout() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasEditorRef = useRef<CanvasEditorHandle>(null);
   const [leftTab, setLeftTab] = useState<LeftTab>("layers");
-  const [rightTab] = useState<RightTab>("properties");
+
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [showExport, setShowExport] = useState(false);
@@ -51,36 +47,32 @@ export function EditorLayout() {
     document.documentElement.classList.toggle("light", !isDark);
   }, [isDark]);
 
-  const {
-    fabricRef,
-    loadLayout,
-    addText,
-    addShape,
-    addImage,
-    deleteSelected,
-    setLayerVisible,
-    setLayerLocked,
-    selectLayerById,
-    exportPNG,
-    exportJPEG,
-    getActiveObject,
-    updateActiveObjectStyle,
-  } = useCanvas(canvasRef);
-
-  const { undo, redo } = useHistory(loadLayout);
-  const { generate } = useAI(fabricRef, loadLayout);
-
-  const handleGenerate = useCallback(
-    (prompt: string, reprompt: boolean) => generate(prompt, reprompt),
-    [generate]
+  const exportPNG = useCallback(() => canvasEditorRef.current?.exportPNG() ?? "", []);
+  const exportJPEG = useCallback(() => canvasEditorRef.current?.exportJPEG() ?? "", []);
+  const getActiveObject = useCallback(() => canvasEditorRef.current?.getActiveObject() ?? null, []);
+  const updateActiveObjectStyle = useCallback(
+    (styles: Record<string, unknown>) => canvasEditorRef.current?.updateActiveObjectStyle(styles),
+    []
+  );
+  const setLayerVisible = useCallback(
+    (id: string, visible: boolean) => canvasEditorRef.current?.setLayerVisible(id, visible),
+    []
+  );
+  const setLayerLocked = useCallback(
+    (id: string, locked: boolean) => canvasEditorRef.current?.setLayerLocked(id, locked),
+    []
+  );
+  const selectLayerById = useCallback(
+    (id: string) => canvasEditorRef.current?.selectLayerById(id),
+    []
   );
 
   const handleApplyTemplate = useCallback(
     async (template: Template) => {
       useCanvasStore.getState().setFormat(template.format);
-      await loadLayout(template.layout);
+      await canvasEditorRef.current?.loadLayout(template.layout);
     },
-    [loadLayout]
+    []
   );
 
   const leftTabs = [
@@ -249,7 +241,7 @@ export function EditorLayout() {
           {activeView === "canvas" ? (
             <>
               <div className="flex-1 overflow-hidden">
-                <CanvasEditor />
+                <CanvasEditor ref={canvasEditorRef} />
               </div>
               <PromptBar />
             </>

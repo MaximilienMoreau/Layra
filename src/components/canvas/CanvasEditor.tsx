@@ -21,9 +21,12 @@ export type CanvasEditorHandle = {
   setLayerLocked: (id: string, locked: boolean) => void;
   selectLayerById: (id: string) => void;
   loadLayout: (layout: ClaudeLayout) => Promise<void>;
+  addSvg: (svgString: string) => Promise<void>;
 };
 
-export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
+type CanvasEditorProps = { onVectorize: () => void };
+
+export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({ onVectorize }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -47,6 +50,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
     addText,
     addShape,
     addImage,
+    addSvg,
     deleteSelected,
     exportPNG,
     exportJPEG,
@@ -69,6 +73,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
     setLayerLocked,
     selectLayerById,
     loadLayout,
+    addSvg,
   }));
 
   useEffect(() => {
@@ -150,6 +155,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
           onAddText={() => { addText(); setActiveTool("select"); }}
           onAddShape={(t) => { addShape(t); setActiveTool("select"); }}
           onAddImage={handleAddImage}
+          onVectorize={onVectorize}
           onDelete={deleteSelected}
           onUndo={undo}
           onRedo={redo}

@@ -6,6 +6,7 @@ export const CREDIT_COSTS = {
   animate_design: 20,
   generate_video: 50,
   export_hd: 5,
+  vectorize_image: 15,
 } as const;
 
 type Plan = "free" | "pro" | "team";

@@ -11,6 +11,7 @@ import { PromptBar } from "@/components/ai/PromptBar";
 import { BrandKitPanel } from "@/components/brand/BrandKitPanel";
 import { TemplateGallery } from "@/components/templates/TemplateGallery";
 import { ExportModal } from "@/components/export/ExportModal";
+import { VectorizerModal } from "@/components/vectorize/VectorizerModal";
 import { useThemeStore } from "@/store/themeStore";
 import type { Template } from "@/components/templates/templates";
 import {
@@ -37,6 +38,7 @@ export function EditorLayout() {
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [showExport, setShowExport] = useState(false);
+  const [showVectorizer, setShowVectorizer] = useState(false);
 
   const { activeView, setActiveView } = useCanvasStore();
   const { activeBrand } = useBrandStore();
@@ -241,7 +243,7 @@ export function EditorLayout() {
           {activeView === "canvas" ? (
             <>
               <div className="flex-1 overflow-hidden">
-                <CanvasEditor ref={canvasEditorRef} />
+                <CanvasEditor ref={canvasEditorRef} onVectorize={() => setShowVectorizer(true)} />
               </div>
               <PromptBar />
             </>
@@ -306,6 +308,14 @@ export function EditorLayout() {
           onClose={() => setShowExport(false)}
           onExportPNG={exportPNG}
           onExportJPEG={exportJPEG}
+        />
+      )}
+
+      {/* Vectorizer modal */}
+      {showVectorizer && (
+        <VectorizerModal
+          onClose={() => setShowVectorizer(false)}
+          onPlaceOnCanvas={(svg) => canvasEditorRef.current?.addSvg(svg)}
         />
       )}
     </div>

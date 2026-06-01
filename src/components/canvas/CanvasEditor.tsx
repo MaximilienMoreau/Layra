@@ -114,7 +114,10 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      await addImage(URL.createObjectURL(file));
+      const url = URL.createObjectURL(file);
+      await addImage(url);
+      URL.revokeObjectURL(url);
+      e.target.value = "";
       setActiveTool("select");
     },
     [addImage]

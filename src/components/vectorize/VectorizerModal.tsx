@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { X, Upload, Wand2, Download, LayoutTemplate, AlertCircle, Loader2, Zap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreditsStore } from "@/store/creditsStore";
@@ -40,14 +40,29 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef<string | null>(null);
+  const svgPreviewUrlRef = useRef<string | null>(null);
   const { spend, canUse } = useCreditsStore();
+
+  useEffect(() => {
+    return () => {
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+      if (svgPreviewUrlRef.current) URL.revokeObjectURL(svgPreviewUrlRef.current);
+    };
+  }, []);
 
   const handleFile = useCallback((f: File) => {
     if (!f.type.startsWith("image/")) return;
     setFile(f);
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     const url = URL.createObjectURL(f);
+    previewUrlRef.current = url;
     setPreviewUrl(url);
     setSvgResult(null);
+    if (svgPreviewUrlRef.current) {
+      URL.revokeObjectURL(svgPreviewUrlRef.current);
+      svgPreviewUrlRef.current = null;
+    }
     setSvgPreviewUrl(null);
     setStatus("idle");
     setError(null);
@@ -64,6 +79,10 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
   );
 
   function resetResult() {
+    if (svgPreviewUrlRef.current) {
+      URL.revokeObjectURL(svgPreviewUrlRef.current);
+      svgPreviewUrlRef.current = null;
+    }
     setSvgResult(null);
     setSvgPreviewUrl(null);
     setStatus("idle");
@@ -79,9 +98,14 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
       const ImageTracer = await import("imagetracerjs");
       const tracer = (ImageTracer as unknown as { default?: typeof ImageTracer }).default ?? ImageTracer;
       const svg = await new Promise<string>((resolve, reject) => {
+        const timeout = setTimeout(
+          () => reject(new Error("Timeout : vectorisation trop longue (>30s)")),
+          30_000
+        );
         (tracer as typeof ImageTracer).imageToSVG(
           previewUrl,
           (svgString: string) => {
+            clearTimeout(timeout);
             if (!svgString) reject(new Error("Résultat vide"));
             else resolve(svgString);
           },
@@ -89,8 +113,11 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
         );
       });
       const blob = new Blob([svg], { type: "image/svg+xml" });
+      if (svgPreviewUrlRef.current) URL.revokeObjectURL(svgPreviewUrlRef.current);
+      const svgUrl = URL.createObjectURL(blob);
+      svgPreviewUrlRef.current = svgUrl;
       setSvgResult(svg);
-      setSvgPreviewUrl(URL.createObjectURL(blob));
+      setSvgPreviewUrl(svgUrl);
       setStatus("success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur de vectorisation");
@@ -113,8 +140,11 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
       const svg = await res.text();
       spend("vectorize_image");
       const blob = new Blob([svg], { type: "image/svg+xml" });
+      if (svgPreviewUrlRef.current) URL.revokeObjectURL(svgPreviewUrlRef.current);
+      const svgUrl = URL.createObjectURL(blob);
+      svgPreviewUrlRef.current = svgUrl;
       setSvgResult(svg);
-      setSvgPreviewUrl(URL.createObjectURL(blob));
+      setSvgPreviewUrl(svgUrl);
       setStatus("success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur de vectorisation");
@@ -124,10 +154,12 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
 
   function downloadSvg() {
     if (!svgResult) return;
+    const url = URL.createObjectURL(new Blob([svgResult], { type: "image/svg+xml" }));
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([svgResult], { type: "image/svg+xml" }));
+    a.href = url;
     a.download = `layra-vector-${Date.now()}.svg`;
     a.click();
+    URL.revokeObjectURL(url);
   }
 
   const canVectorize =

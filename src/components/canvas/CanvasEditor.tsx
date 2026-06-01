@@ -112,6 +112,8 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
       if (!file) return;
       const url = URL.createObjectURL(file);
       await addImage(url);
+      URL.revokeObjectURL(url);
+      e.target.value = "";
       setActiveTool("select");
     },
     [addImage]

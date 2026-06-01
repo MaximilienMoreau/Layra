@@ -74,10 +74,14 @@ async function supabaseSpend(sessionId: string, action: Action): Promise<boolean
   const current = existing?.credits ?? FREE_CREDITS;
   if (current < cost) return false;
 
-  await sb
+  const { error } = await sb
     .from("session_credits")
     .upsert({ session_id: sessionId, credits: current - cost }, { onConflict: "session_id" });
 
+  if (error) {
+    console.error("[serverCredits] upsert failed:", error);
+    return false;
+  }
   return true;
 }
 

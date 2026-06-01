@@ -156,15 +156,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "userPrompt requis" }, { status: 400 });
     }
 
-    // --- Validation des crédits côté serveur ---
-    if (sessionId && typeof sessionId === "string") {
-      const allowed = await serverCanUse(sessionId, "generate_design");
-      if (!allowed) {
-        return NextResponse.json(
-          { error: "Crédits insuffisants. Passez à un plan supérieur." },
-          { status: 402 }
-        );
+    if (!sessionId || typeof sessionId !== "string") {
+      return NextResponse.json({ error: "sessionId requis" }, { status: 400 });
+    }
+
+    if (format !== undefined) {
+      const w = format?.width;
+      const h = format?.height;
+      if (
+        (w !== undefined && (typeof w !== "number" || w < 1 || w > 8000)) ||
+        (h !== undefined && (typeof h !== "number" || h < 1 || h > 8000))
+      ) {
+        return NextResponse.json({ error: "Dimensions de format invalides" }, { status: 400 });
       }
+    }
+
+    // --- Validation des crédits côté serveur ---
+    const allowed = await serverCanUse(sessionId, "generate_design");
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Crédits insuffisants. Passez à un plan supérieur." },
+        { status: 402 }
+      );
     }
 
     const systemPrompt = buildSystemPrompt(locale);
@@ -195,9 +208,7 @@ export async function POST(req: NextRequest) {
     const validated = ClaudeLayoutSchema.parse(parsed);
 
     // Décompte côté serveur après succès de la génération
-    if (sessionId && typeof sessionId === "string") {
-      await serverSpend(sessionId, "generate_design");
-    }
+    await serverSpend(sessionId, "generate_design");
 
     return NextResponse.json({ layout: validated });
   } catch (err) {

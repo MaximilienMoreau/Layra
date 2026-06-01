@@ -51,7 +51,9 @@ export function useAI(
         spend("generate_design");
 
         // Persistance silencieuse — ne bloque pas si Supabase n'est pas configuré
-        saveDesign(layout, format, prompt.slice(0, 60) || "Design généré").catch(() => null);
+        saveDesign(layout, format, prompt.slice(0, 60) || "Design généré").catch((e) => {
+          console.error("[AI] saveDesign unexpected error:", e);
+        });
 
         setGenerationProgress("Terminé !");
       } catch (err) {

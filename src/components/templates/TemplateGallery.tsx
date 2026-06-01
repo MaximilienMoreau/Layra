@@ -86,7 +86,7 @@ export function TemplateGallery({ onApply }: Props) {
               <div className="p-3">
                 <p className="text-xs font-medium text-white truncate">{template.name}</p>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-zinc-500">{template.category}</span>
+                  <span className="text-xs text-zinc-500">{template.format.name}</span>
                   <span className="text-xs text-zinc-600">
                     {template.format.width}×{template.format.height}
                   </span>

@@ -21,17 +21,28 @@ export type CanvasEditorHandle = {
   setLayerLocked: (id: string, locked: boolean) => void;
   selectLayerById: (id: string) => void;
   loadLayout: (layout: ClaudeLayout) => Promise<void>;
+  addSvg: (svgString: string) => Promise<void>;
 };
 
-export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
+type CanvasEditorProps = { onVectorize: () => void };
+
+export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({ onVectorize }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTool, setActiveTool] = useState<Tool>("select");
   const [scale, setScale] = useState(0.4);
 
-  const { format, isGenerating, generationProgress, generationError, historyIndex, history, setFormat, setGenerationError } =
-    useCanvasStore();
+  const {
+    format,
+    isGenerating,
+    generationProgress,
+    generationError,
+    historyIndex,
+    history,
+    setFormat,
+    setGenerationError,
+  } = useCanvasStore();
 
   const {
     fabricRef,
@@ -39,6 +50,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
     addText,
     addShape,
     addImage,
+    addSvg,
     deleteSelected,
     exportPNG,
     exportJPEG,
@@ -61,14 +73,13 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
     setLayerLocked,
     selectLayerById,
     loadLayout,
+    addSvg,
   }));
 
-  // Keyboard shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
-
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
         e.preventDefault();
         if (e.shiftKey) redo();
@@ -78,23 +89,18 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
         e.preventDefault();
         redo();
       }
-      if (e.key === "Delete" || e.key === "Backspace") {
-        deleteSelected();
-      }
+      if (e.key === "Delete" || e.key === "Backspace") deleteSelected();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [undo, redo, deleteSelected]);
 
-  // Auto-scale canvas to fit container
   useEffect(() => {
     const updateScale = () => {
       if (!containerRef.current) return;
       const { width, height } = containerRef.current.getBoundingClientRect();
       const padding = 80;
-      const scaleX = (width - padding) / format.width;
-      const scaleY = (height - padding) / format.height;
-      setScale(Math.min(scaleX, scaleY, 1));
+      setScale(Math.min((width - padding) / format.width, (height - padding) / format.height, 1));
     };
     updateScale();
     const observer = new ResizeObserver(updateScale);
@@ -102,24 +108,18 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
     return () => observer.disconnect();
   }, [format]);
 
-  const handleAddImage = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
+  const handleAddImage = useCallback(() => fileInputRef.current?.click(), []);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const url = URL.createObjectURL(file);
-      await addImage(url);
-      URL.revokeObjectURL(url);
-      e.target.value = "";
+      await addImage(URL.createObjectURL(file));
       setActiveTool("select");
     },
     [addImage]
   );
 
-  // Expose generate for PromptBar (via window event)
   useEffect(() => {
     const onGenerate = (e: Event) => {
       const ce = e as CustomEvent<{ prompt: string; reprompt: boolean }>;
@@ -131,7 +131,6 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
 
   return (
     <div className="flex flex-col h-full bg-zinc-950">
-      {/* Format selector bar */}
       <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border-b border-zinc-800 overflow-x-auto">
         <span className="text-xs text-zinc-500 shrink-0">Format :</span>
         {CANVAS_FORMATS.map((f) => (
@@ -149,7 +148,6 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
         ))}
       </div>
 
-      {/* Main editor area */}
       <div className="flex flex-1 overflow-hidden">
         <Toolbar
           activeTool={activeTool}
@@ -157,6 +155,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
           onAddText={() => { addText(); setActiveTool("select"); }}
           onAddShape={(t) => { addShape(t); setActiveTool("select"); }}
           onAddImage={handleAddImage}
+          onVectorize={onVectorize}
           onDelete={deleteSelected}
           onUndo={undo}
           onRedo={redo}
@@ -164,7 +163,6 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, {}>((_, ref) => {
           historyLength={history.length}
         />
 
-        {/* Canvas container */}
         <div
           ref={containerRef}
           className="flex-1 flex items-center justify-center canvas-workspace overflow-hidden relative"

@@ -210,6 +210,26 @@ export function useCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
     }
   }, []);
 
+  const addSvg = useCallback(async (svgString: string) => {
+    const canvas = fabricRef.current;
+    const fabric = fabricModuleRef.current;
+    if (!canvas || !fabric) return;
+    const id = `svg_${Date.now()}`;
+    const blob = new Blob([svgString], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    try {
+      const img = await fabric.FabricImage.fromURL(url, { crossOrigin: "anonymous" });
+      img.scaleToWidth(Math.min(400, canvas.width!));
+      img.set({ left: 100, top: 100 });
+      img.layra = { id, name: "SVG vectoriel", elementType: "image", locked: false, visible: true };
+      canvas.add(img);
+      canvas.setActiveObject(img);
+      canvas.renderAll();
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }, []);
+
   const exportPNG = useCallback((): string => {
     const canvas = fabricRef.current;
     if (!canvas) return "";
@@ -245,6 +265,7 @@ export function useCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
     addText,
     addShape,
     addImage,
+    addSvg,
     deleteSelected,
     setLayerVisible,
     setLayerLocked,

@@ -4,14 +4,14 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { useCanvasStore } from "@/store/canvasStore";
 import { useBrandStore } from "@/store/brandStore";
 import { useCreditsStore } from "@/store/creditsStore";
-import { CanvasEditor } from "@/components/canvas/CanvasEditor";
-import type { CanvasEditorHandle } from "@/components/canvas/CanvasEditor";
+import { CanvasEditor, type CanvasEditorHandle } from "@/components/canvas/CanvasEditor";
 import { LayerPanel } from "@/components/canvas/LayerPanel";
 import { PropertiesPanel } from "@/components/canvas/PropertiesPanel";
 import { PromptBar } from "@/components/ai/PromptBar";
 import { BrandKitPanel } from "@/components/brand/BrandKitPanel";
 import { TemplateGallery } from "@/components/templates/TemplateGallery";
 import { ExportModal } from "@/components/export/ExportModal";
+import { VectorizerModal } from "@/components/vectorize/VectorizerModal";
 import { useThemeStore } from "@/store/themeStore";
 import type { Template } from "@/components/templates/templates";
 import {
@@ -34,9 +34,11 @@ type LeftTab = "layers" | "brand" | "templates";
 export function EditorLayout() {
   const canvasEditorRef = useRef<CanvasEditorHandle>(null);
   const [leftTab, setLeftTab] = useState<LeftTab>("layers");
+
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [showExport, setShowExport] = useState(false);
+  const [showVectorizer, setShowVectorizer] = useState(false);
 
   const { activeView, setActiveView } = useCanvasStore();
   const { activeBrand } = useBrandStore();
@@ -47,24 +49,31 @@ export function EditorLayout() {
     document.documentElement.classList.toggle("light", !isDark);
   }, [isDark]);
 
-  // Wrappers that delegate to the real Fabric canvas inside CanvasEditor
-  const setLayerVisible = useCallback((id: string, visible: boolean) => {
-    canvasEditorRef.current?.setLayerVisible(id, visible);
-  }, []);
-
-  const setLayerLocked = useCallback((id: string, locked: boolean) => {
-    canvasEditorRef.current?.setLayerLocked(id, locked);
-  }, []);
-
-  const selectLayerById = useCallback((id: string) => {
-    canvasEditorRef.current?.selectLayerById(id);
-  }, []);
-
   const exportPNG = useCallback(() => canvasEditorRef.current?.exportPNG() ?? "", []);
   const exportJPEG = useCallback(() => canvasEditorRef.current?.exportJPEG() ?? "", []);
+  const getActiveObject = useCallback(() => canvasEditorRef.current?.getActiveObject() ?? null, []);
+  const updateActiveObjectStyle = useCallback(
+    (styles: Record<string, unknown>) => canvasEditorRef.current?.updateActiveObjectStyle(styles),
+    []
+  );
+  const setLayerVisible = useCallback(
+    (id: string, visible: boolean) => canvasEditorRef.current?.setLayerVisible(id, visible),
+    []
+  );
+  const setLayerLocked = useCallback(
+    (id: string, locked: boolean) => canvasEditorRef.current?.setLayerLocked(id, locked),
+    []
+  );
+  const selectLayerById = useCallback(
+    (id: string) => canvasEditorRef.current?.selectLayerById(id),
+    []
+  );
 
-  const getActiveObject = useCallback(
-    () => canvasEditorRef.current?.getActiveObject() ?? null,
+  const handleApplyTemplate = useCallback(
+    async (template: Template) => {
+      useCanvasStore.getState().setFormat(template.format);
+      await canvasEditorRef.current?.loadLayout(template.layout);
+    },
     []
   );
 
@@ -242,7 +251,7 @@ export function EditorLayout() {
           {activeView === "canvas" ? (
             <>
               <div className="flex-1 overflow-hidden">
-                <CanvasEditor ref={canvasEditorRef} />
+                <CanvasEditor ref={canvasEditorRef} onVectorize={() => setShowVectorizer(true)} />
               </div>
               <PromptBar />
             </>
@@ -306,6 +315,14 @@ export function EditorLayout() {
           onClose={() => setShowExport(false)}
           onExportPNG={exportPNG}
           onExportJPEG={exportJPEG}
+        />
+      )}
+
+      {/* Vectorizer modal */}
+      {showVectorizer && (
+        <VectorizerModal
+          onClose={() => setShowVectorizer(false)}
+          onPlaceOnCanvas={(svg) => canvasEditorRef.current?.addSvg(svg)}
         />
       )}
     </div>

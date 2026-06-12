@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { serverCanUse, serverSpend } from "@/lib/serverCredits";
 
 const API_ID = process.env.VECTORIZER_API_ID;
 const API_SECRET = process.env.VECTORIZER_API_SECRET;
@@ -16,6 +17,19 @@ export async function POST(req: NextRequest) {
     const image = formData.get("image") as File | null;
     if (!image) {
       return NextResponse.json({ error: "Image requise" }, { status: 400 });
+    }
+
+    const sessionId = formData.get("sessionId");
+    if (!sessionId || typeof sessionId !== "string") {
+      return NextResponse.json({ error: "sessionId requis" }, { status: 400 });
+    }
+
+    const allowed = await serverCanUse(sessionId, "vectorize_image");
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Crédits insuffisants. Passez à un plan supérieur." },
+        { status: 402 }
+      );
     }
 
     const upstream = new FormData();
@@ -38,6 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     const svgText = await response.text();
+    await serverSpend(sessionId, "vectorize_image");
     return new NextResponse(svgText, {
       status: 200,
       headers: { "Content-Type": "image/svg+xml" },

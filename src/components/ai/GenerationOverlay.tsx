@@ -41,16 +41,16 @@ export function GenerationOverlay({ progress, isError, onDismiss }: Props) {
   const isDone = progress.toLowerCase().includes("terminé");
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-950/85 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-5 bg-gray-900 rounded-2xl p-8 border border-gray-700 shadow-2xl w-80 mx-4">
+    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950/85 backdrop-blur-sm">
+      <div className="flex flex-col items-center gap-5 bg-zinc-900 rounded-2xl p-8 border border-zinc-700 shadow-2xl w-80 mx-4">
 
         {/* Icône centrale */}
         {isError ? (
           <AlertCircle className="text-red-400" size={40} />
         ) : isDone ? (
-          <CheckCircle2 className="text-green-400" size={40} />
+          <CheckCircle2 className="text-emerald-400" size={40} />
         ) : (
-          <Loader2 className="text-indigo-400 animate-spin" size={40} />
+          <Loader2 className="text-rose-400 animate-spin" size={40} />
         )}
 
         {/* Message principal */}
@@ -61,9 +61,9 @@ export function GenerationOverlay({ progress, isError, onDismiss }: Props) {
         {/* Barre de progression */}
         {!isError && (
           <div className="w-full">
-            <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-indigo-500 rounded-full transition-all duration-500 ease-out"
+                className="h-full bg-rose-500 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${percent}%` }}
               />
             </div>
@@ -80,19 +80,19 @@ export function GenerationOverlay({ progress, isError, onDismiss }: Props) {
                     <div
                       className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
                         step.done
-                          ? "bg-green-400"
+                          ? "bg-emerald-400"
                           : isActive
-                          ? "bg-indigo-400 animate-pulse"
-                          : "bg-gray-700"
+                          ? "bg-rose-400 animate-pulse"
+                          : "bg-zinc-700"
                       }`}
                     />
                     <span
                       className={`text-xs transition-colors ${
                         step.done
-                          ? "text-green-400"
+                          ? "text-emerald-400"
                           : isActive
-                          ? "text-indigo-300"
-                          : "text-gray-600"
+                          ? "text-rose-300"
+                          : "text-zinc-600"
                       }`}
                     >
                       {step.label}
@@ -108,7 +108,7 @@ export function GenerationOverlay({ progress, isError, onDismiss }: Props) {
         {isError && onDismiss && (
           <button
             onClick={onDismiss}
-            className="mt-1 px-4 py-1.5 rounded-lg text-xs font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition-colors border border-gray-700"
+            className="mt-1 px-4 py-1.5 rounded-lg text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors border border-zinc-700"
           >
             Fermer
           </button>

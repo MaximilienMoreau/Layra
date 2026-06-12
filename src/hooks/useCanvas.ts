@@ -12,7 +12,6 @@ export function useCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
     format,
     setLayers,
     setSelectedLayerId,
-    pushHistory,
     updateLayerVisibility,
     updateLayerLock,
   } = useCanvasStore();
@@ -96,9 +95,8 @@ export function useCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
       const { jsonToCanvas } = await import("@/utils/jsonToCanvas");
       await jsonToCanvas(layout, canvas, fabric);
       syncLayers();
-      pushHistory(layout);
     },
-    [syncLayers, pushHistory]
+    [syncLayers]
   );
 
   const addText = useCallback(() => {
@@ -134,7 +132,7 @@ export function useCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
     } else {
       shape = new fabric.Rect({ ...opts, rx: 8, ry: 8 });
     }
-    shape.layra = { id, name: shapeType, elementType: "shape", locked: false, visible: true };
+    shape.layra = { id, name: shapeType, elementType: "shape", locked: false, visible: true, shapeType };
     canvas.add(shape);
     canvas.setActiveObject(shape);
     canvas.renderAll();

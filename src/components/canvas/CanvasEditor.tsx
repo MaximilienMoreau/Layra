@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
-import { Loader2 } from "lucide-react";
 import { useCanvas } from "@/hooks/useCanvas";
 import { useHistory } from "@/hooks/useHistory";
 import { useAI } from "@/hooks/useAI";
@@ -42,6 +41,8 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle>((_, ref) => {
     setFormat,
     setGenerationError,
   } = useCanvasStore();
+
+  const showOverlay = isGenerating || !!generationError;
 
   const {
     fabricRef,
@@ -170,17 +171,12 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle>((_, ref) => {
           ref={containerRef}
           className="flex-1 flex items-center justify-center bg-zinc-950 overflow-hidden relative"
         >
-          {/* Loading overlay */}
-          {isGenerating && (
-            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950/80 backdrop-blur-sm">
-              <div className="flex flex-col items-center gap-4 bg-zinc-900 rounded-2xl p-8 border border-zinc-700 shadow-2xl max-w-sm mx-4">
-                <Loader2 className="text-rose-500 animate-spin" size={40} />
-                <p className="text-white font-medium text-center">{generationProgress}</p>
-                <div className="w-48 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-rose-500 rounded-full animate-pulse w-3/4" />
-                </div>
-              </div>
-            </div>
+          {showOverlay && (
+            <GenerationOverlay
+              progress={generationError ?? generationProgress}
+              isError={!!generationError}
+              onDismiss={generationError ? () => setGenerationError(null) : undefined}
+            />
           )}
 
           <div

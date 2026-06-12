@@ -4,6 +4,7 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { X, Upload, Wand2, Download, LayoutTemplate, AlertCircle, Loader2, Zap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreditsStore } from "@/store/creditsStore";
+import { getSessionId } from "@/lib/session";
 
 type Mode = "fast" | "ai";
 type Status = "idle" | "loading" | "success" | "error";
@@ -132,13 +133,14 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
     try {
       const formData = new FormData();
       formData.append("image", file);
+      formData.append("sessionId", getSessionId());
       const res = await fetch("/api/vectorize", { method: "POST", body: formData });
       if (!res.ok) {
         const json = await res.json().catch(() => ({ error: "Erreur inconnue" }));
         throw new Error(json.error ?? `HTTP ${res.status}`);
       }
       const svg = await res.text();
-      spend("vectorize_image");
+      spend("vectorize_image"); // Sync client-side counter with server spend
       const blob = new Blob([svg], { type: "image/svg+xml" });
       if (svgPreviewUrlRef.current) URL.revokeObjectURL(svgPreviewUrlRef.current);
       const svgUrl = URL.createObjectURL(blob);

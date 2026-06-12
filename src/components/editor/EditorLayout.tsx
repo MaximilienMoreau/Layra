@@ -70,8 +70,10 @@ export function EditorLayout() {
     []
   );
   const handleApplyTemplate = useCallback(async (template: Template) => {
-    useCanvasStore.getState().setFormat(template.format);
+    const store = useCanvasStore.getState();
+    store.setFormat(template.format);
     await canvasEditorRef.current?.loadLayout(template.layout);
+    store.pushHistory(template.layout);
   }, []);
 
   const leftTabs = [

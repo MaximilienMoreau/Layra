@@ -33,6 +33,7 @@ export function canvasToJson(canvas: FabricCanvas): CanvasElement[] {
             color: textObj.fill as string,
             textAlign: textObj.textAlign as "left" | "center" | "right",
             lineHeight: textObj.lineHeight,
+            letterSpacing: textObj.charSpacing ?? 0,
             italic: textObj.fontStyle === "italic",
             underline: textObj.underline,
             opacity: textObj.opacity,
@@ -44,10 +45,10 @@ export function canvasToJson(canvas: FabricCanvas): CanvasElement[] {
         return {
           ...base,
           type: "shape" as const,
-          shapeType: meta.name as "rect" | "circle" | "triangle",
+          shapeType: meta.shapeType ?? "rect",
           style: {
             fill: obj.fill as string,
-            stroke: obj.stroke as string,
+            stroke: obj.stroke as string | undefined ?? undefined,
             strokeWidth: obj.strokeWidth,
             opacity: obj.opacity,
           },

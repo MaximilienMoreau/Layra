@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 
 const GOOGLE_FONTS = [
   "Inter", "Roboto", "Playfair Display", "Montserrat", "Poppins",
-  "Open Sans", "Lato", "Raleway", "Oswald", "Merriweather", "DM Sans",
+  "Open Sans", "Lato", "Raleway", "Oswald", "Merriweather",
+  "Source Code Pro", "DM Sans", "Space Grotesk",
 ];
 
 export function BrandKitPanel() {
@@ -67,7 +68,7 @@ export function BrandKitPanel() {
         {/* Explication contextuelle */}
         <p className={cn(
           "text-xs px-1 leading-relaxed transition-colors",
-          activeBrand.locked ? "text-indigo-400" : "text-gray-600"
+          activeBrand.locked ? "text-rose-400" : "text-zinc-600"
         )}>
           {activeBrand.locked
             ? "Verrouillé : Claude utilise exclusivement votre palette et vos polices lors de la génération."

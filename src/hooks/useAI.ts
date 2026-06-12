@@ -14,7 +14,7 @@ export function useAI(
   fabricRef: React.RefObject<FabricCanvas | null>,
   loadLayout: (layout: ClaudeLayout) => Promise<void>
 ) {
-  const { format, setIsGenerating, setGenerationProgress, setGenerationError } =
+  const { format, setIsGenerating, setGenerationProgress, setGenerationError, pushHistory } =
     useCanvasStore();
   const { activeBrand } = useBrandStore();
   const { canUse, spend } = useCreditsStore();
@@ -48,6 +48,7 @@ export function useAI(
 
         setGenerationProgress("Application du design...");
         await loadLayout(layout);
+        pushHistory(layout);
         spend("generate_design");
 
         // Persistance silencieuse — ne bloque pas si Supabase n'est pas configuré
@@ -71,6 +72,7 @@ export function useAI(
     [
       canUse,
       spend,
+      pushHistory,
       format,
       activeBrand,
       fabricRef,

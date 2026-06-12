@@ -32,7 +32,7 @@ export function ExportModal({ onClose, onExportPNG, onExportJPEG }: Props) {
       if (selectedFormat === "png") dataUrl = onExportPNG();
       else if (selectedFormat === "jpg") dataUrl = onExportJPEG();
 
-      if (dataUrl && canUse("export_hd")) {
+      if (dataUrl) {
         const a = document.createElement("a");
         a.href = dataUrl;
         a.download = `layra-design-${Date.now()}.${selectedFormat}`;

@@ -1,6 +1,11 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
+<<<<<<< HEAD
+=======
+import { useCanvas } from "@/hooks/useCanvas";
+import { useHistory } from "@/hooks/useHistory";
+>>>>>>> main
 import { useCanvasStore } from "@/store/canvasStore";
 import { useBrandStore } from "@/store/brandStore";
 import { useCreditsStore } from "@/store/creditsStore";
@@ -28,6 +33,7 @@ import {
   Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useThemeStore } from "@/store/themeStore";
 
 type LeftTab = "layers" | "brand" | "templates";
 
@@ -44,6 +50,13 @@ export function EditorLayout() {
   const { activeBrand } = useBrandStore();
   const { credits } = useCreditsStore();
   const { isDark, toggle: toggleTheme } = useThemeStore();
+<<<<<<< HEAD
+=======
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("light", !isDark);
+  }, [isDark]);
+>>>>>>> main
 
   useEffect(() => {
     document.documentElement.classList.toggle("light", !isDark);

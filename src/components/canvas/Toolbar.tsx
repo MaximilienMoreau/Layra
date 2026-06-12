@@ -41,17 +41,27 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
       {/* Undo/Redo */}
       <button
         onClick={onUndo}
+<<<<<<< HEAD
         disabled={historyIndex <= 0}
         className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         title={`Annuler (Ctrl+Z)${historyIndex > 0 ? ` — étape ${historyIndex + 1}/${historyLength}` : ""}`}
+=======
+        className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+        title="Annuler (Ctrl+Z)"
+>>>>>>> main
       >
         <Undo2 size={16} />
       </button>
       <button
         onClick={onRedo}
+<<<<<<< HEAD
         disabled={historyIndex >= historyLength - 1}
         className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         title={`Refaire (Ctrl+Y)${historyIndex < historyLength - 1 ? ` — étape ${historyIndex + 2}/${historyLength}` : ""}`}
+=======
+        className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+        title="Refaire (Ctrl+Y)"
+>>>>>>> main
       >
         <Redo2 size={16} />
       </button>
@@ -81,6 +91,7 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
       ))}
 
       <div className="w-6 h-px bg-zinc-700 my-1" />
+<<<<<<< HEAD
 
       <button
         onClick={onVectorize}
@@ -91,6 +102,8 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
       </button>
 
       <div className="w-6 h-px bg-zinc-700 my-1" />
+=======
+>>>>>>> main
 
       <button
         onClick={onDelete}

@@ -11,15 +11,21 @@ export function useHistory(
 
   const undo = useCallback(async () => {
     const layout = storeUndo();
-    if (layout) {
-      try { await loadLayout(layout); } catch (err) { console.error("[History] undo failed:", err); }
+    if (!layout) return;
+    try {
+      await loadLayout(layout);
+    } catch (err) {
+      console.error("[History] undo failed:", err);
     }
   }, [storeUndo, loadLayout]);
 
   const redo = useCallback(async () => {
     const layout = storeRedo();
-    if (layout) {
-      try { await loadLayout(layout); } catch (err) { console.error("[History] redo failed:", err); }
+    if (!layout) return;
+    try {
+      await loadLayout(layout);
+    } catch (err) {
+      console.error("[History] redo failed:", err);
     }
   }, [storeRedo, loadLayout]);
 

@@ -25,18 +25,21 @@ function gradientCoords(
   if (d === "to top") return { x1: 0, y1: h, x2: 0, y2: 0 };
   if (d === "to right") return { x1: 0, y1: 0, x2: w, y2: 0 };
   if (d === "to left") return { x1: w, y1: 0, x2: 0, y2: 0 };
-  if (d === "to bottom right" || d === "to right bottom") return { x1: 0, y1: 0, x2: w, y2: h };
-  if (d === "to bottom left" || d === "to left bottom") return { x1: w, y1: 0, x2: 0, y2: h };
-  if (d === "to top right" || d === "to right top") return { x1: 0, y1: h, x2: w, y2: 0 };
-  if (d === "to top left" || d === "to left top") return { x1: w, y1: h, x2: 0, y2: 0 };
+  if (d === "to bottom right") return { x1: 0, y1: 0, x2: w, y2: h };
+  if (d === "to bottom left") return { x1: w, y1: 0, x2: 0, y2: h };
+  if (d === "to top right") return { x1: 0, y1: h, x2: w, y2: 0 };
+  if (d === "to top left") return { x1: w, y1: h, x2: 0, y2: 0 };
   const deg = parseFloat(d);
   if (!isNaN(deg)) {
     const rad = ((deg - 90) * Math.PI) / 180;
+    const cx = w / 2;
+    const cy = h / 2;
+    const len = Math.sqrt(w * w + h * h) / 2;
     return {
-      x1: w / 2 - (Math.cos(rad) * w) / 2,
-      y1: h / 2 - (Math.sin(rad) * h) / 2,
-      x2: w / 2 + (Math.cos(rad) * w) / 2,
-      y2: h / 2 + (Math.sin(rad) * h) / 2,
+      x1: cx - Math.cos(rad) * len,
+      y1: cy - Math.sin(rad) * len,
+      x2: cx + Math.cos(rad) * len,
+      y2: cy + Math.sin(rad) * len,
     };
   }
   return { x1: 0, y1: 0, x2: 0, y2: h };
@@ -191,10 +194,11 @@ export async function jsonToCanvas(
   if (background.type === "color") {
     canvas.backgroundColor = background.value;
   } else if (background.type === "gradient" && background.gradient) {
+    const coords = gradientCoords(background.gradient.direction, canvas.width!, canvas.height!);
     const gradient = new fabricModule.Gradient({
       type: "linear",
       gradientUnits: "pixels",
-      coords: gradientCoords(background.gradient.direction, canvas.width!, canvas.height!),
+      coords,
       colorStops: [
         { offset: 0, color: background.gradient.from },
         { offset: 1, color: background.gradient.to },

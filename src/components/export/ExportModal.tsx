@@ -25,14 +25,12 @@ export function ExportModal({ onClose, onExportPNG, onExportJPEG }: Props) {
   ];
 
   async function handleExport() {
+    if (!canUse("export_hd")) return;
     setIsExporting(true);
     try {
       let dataUrl = "";
-      if (selectedFormat === "png") {
-        dataUrl = onExportPNG();
-      } else if (selectedFormat === "jpg") {
-        dataUrl = onExportJPEG();
-      }
+      if (selectedFormat === "png") dataUrl = onExportPNG();
+      else if (selectedFormat === "jpg") dataUrl = onExportJPEG();
 
       if (dataUrl && canUse("export_hd")) {
         const a = document.createElement("a");

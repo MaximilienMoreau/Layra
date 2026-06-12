@@ -114,7 +114,10 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      await addImage(URL.createObjectURL(file));
+      const url = URL.createObjectURL(file);
+      await addImage(url);
+      URL.revokeObjectURL(url);
+      e.target.value = "";
       setActiveTool("select");
     },
     [addImage]
@@ -131,6 +134,10 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
 
   return (
     <div className="flex flex-col h-full bg-zinc-950">
+<<<<<<< HEAD
+=======
+      {/* Format selector bar */}
+>>>>>>> main
       <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border-b border-zinc-800 overflow-x-auto">
         <span className="text-xs text-zinc-500 shrink-0">Format :</span>
         {CANVAS_FORMATS.map((f) => (
@@ -165,6 +172,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
 
         <div
           ref={containerRef}
+<<<<<<< HEAD
           className="flex-1 flex items-center justify-center canvas-workspace overflow-hidden relative"
         >
           {(isGenerating || generationError) && (
@@ -173,6 +181,21 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
               isError={!!generationError}
               onDismiss={generationError ? () => setGenerationError(null) : undefined}
             />
+=======
+          className="flex-1 flex items-center justify-center bg-zinc-950 overflow-hidden relative"
+        >
+          {/* Loading overlay */}
+          {isGenerating && (
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950/80 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-4 bg-zinc-900 rounded-2xl p-8 border border-zinc-700 shadow-2xl max-w-sm mx-4">
+                <Loader2 className="text-rose-500 animate-spin" size={40} />
+                <p className="text-white font-medium text-center">{generationProgress}</p>
+                <div className="w-48 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-rose-500 rounded-full animate-pulse w-3/4" />
+                </div>
+              </div>
+            </div>
+>>>>>>> main
           )}
 
           <div
@@ -182,6 +205,10 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
             <canvas ref={canvasRef} />
           </div>
 
+<<<<<<< HEAD
+=======
+          {/* Scale indicator */}
+>>>>>>> main
           <div className="absolute bottom-4 right-4 text-xs text-zinc-600 bg-zinc-900 px-2 py-1 rounded-md">
             {Math.round(scale * 100)}% — {format.width}×{format.height}px
           </div>

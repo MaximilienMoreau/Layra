@@ -7,6 +7,7 @@ export interface LayraMeta {
   visible: boolean;
   elementType: "text" | "image" | "shape" | "video" | "background";
   name: string;
+  shapeType?: "rect" | "circle" | "triangle";
 }
 
 declare module "fabric" {
@@ -107,7 +108,7 @@ async function createElement(
     } else {
       obj = new fabric.Rect(shapeOpts);
     }
-    obj.layra = { ...meta, name: shapeType || "rect" };
+    obj.layra = { ...meta, name: shapeType || "rect", shapeType: shapeType ?? "rect" };
     return obj;
   }
 

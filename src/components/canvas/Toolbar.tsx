@@ -28,6 +28,9 @@ const tools = [
 ];
 
 export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAddImage, onDelete, onUndo, onRedo, historyIndex = -1, historyLength = 0 }: Props) {
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < historyLength - 1;
+
   function handleToolClick(tool: Tool) {
     onToolChange(tool);
     if (tool === "text") onAddText();
@@ -40,20 +43,32 @@ export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAdd
       {/* Undo/Redo */}
       <button
         onClick={onUndo}
-        className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+        disabled={!canUndo}
+        className={cn(
+          "p-2 rounded-lg transition-colors",
+          canUndo
+            ? "text-zinc-400 hover:text-white hover:bg-zinc-800"
+            : "text-zinc-700 cursor-not-allowed"
+        )}
         title="Annuler (Ctrl+Z)"
       >
         <Undo2 size={16} />
       </button>
       <button
         onClick={onRedo}
-        className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+        disabled={!canRedo}
+        className={cn(
+          "p-2 rounded-lg transition-colors",
+          canRedo
+            ? "text-zinc-400 hover:text-white hover:bg-zinc-800"
+            : "text-zinc-700 cursor-not-allowed"
+        )}
         title="Refaire (Ctrl+Y)"
       >
         <Redo2 size={16} />
       </button>
       {historyLength > 0 && (
-        <span className="text-[9px] text-gray-700 tabular-nums" title="Position dans l'historique">
+        <span className="text-[9px] text-zinc-700 tabular-nums" title="Position dans l'historique">
           {historyIndex + 1}/{historyLength}
         </span>
       )}

@@ -39,7 +39,6 @@ export function PropertiesPanel({ getActiveObject, updateStyle }: Props) {
   }, [getActiveObject]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [selectedLayerId, refresh]);
 
@@ -80,7 +79,7 @@ export function PropertiesPanel({ getActiveObject, updateStyle }: Props) {
               <input
                 type="number"
                 value={props[k] as number || 0}
-                onChange={(e) => update(k, parseInt(e.target.value))}
+                onChange={(e) => update(k, parseInt(e.target.value, 10))}
                 className="bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1 text-xs text-white w-full"
               />
             </div>
@@ -150,7 +149,7 @@ export function PropertiesPanel({ getActiveObject, updateStyle }: Props) {
               min={8}
               max={400}
               value={props.fontSize as number || 32}
-              onChange={(e) => update("fontSize", parseInt(e.target.value))}
+              onChange={(e) => update("fontSize", parseInt(e.target.value, 10))}
               className="bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1 text-xs text-white w-full"
             />
           </section>
@@ -203,7 +202,7 @@ export function PropertiesPanel({ getActiveObject, updateStyle }: Props) {
               min={0}
               max={20}
               value={props.strokeWidth as number || 0}
-              onChange={(e) => update("strokeWidth", parseInt(e.target.value))}
+              onChange={(e) => update("strokeWidth", parseInt(e.target.value, 10))}
               className="flex-1 bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1 text-xs text-white"
               placeholder="Épaisseur"
             />

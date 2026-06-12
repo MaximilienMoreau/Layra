@@ -1,6 +1,6 @@
 "use client";
 
-import { MousePointer2, Type, Square, Circle, Triangle, ImagePlus, Trash2, Undo2, Redo2, Wand2 } from "lucide-react";
+import { MousePointer2, Type, Square, Circle, Triangle, ImagePlus, Trash2, Undo2, Redo2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Tool = "select" | "text" | "rect" | "circle" | "triangle" | "image";
@@ -11,7 +11,6 @@ type Props = {
   onAddText: () => void;
   onAddShape: (type: "rect" | "circle" | "triangle") => void;
   onAddImage: () => void;
-  onVectorize: () => void;
   onDelete: () => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -28,7 +27,7 @@ const tools = [
   { id: "image" as Tool, icon: ImagePlus, label: "Image" },
 ];
 
-export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAddImage, onVectorize, onDelete, onUndo, onRedo, historyIndex = -1, historyLength = 0 }: Props) {
+export function Toolbar({ activeTool, onToolChange, onAddText, onAddShape, onAddImage, onDelete, onUndo, onRedo, historyIndex = -1, historyLength = 0 }: Props) {
   function handleToolClick(tool: Tool) {
     onToolChange(tool);
     if (tool === "text") onAddText();

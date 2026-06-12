@@ -57,11 +57,7 @@ body {
 
 /* Selection range accent */
 input[type="range"]::-webkit-slider-thumb {
-<<<<<<< HEAD
-  accent-color: #f43f5e;
-=======
   accent-color: #e11d48;
->>>>>>> main
 }
 
 /* ===== LIGHT MODE ===== */
@@ -77,11 +73,7 @@ html.light .bg-zinc-900 { background-color: #ffffff !important; }
 html.light .bg-zinc-800 { background-color: #f1f5f9 !important; }
 html.light .bg-zinc-700 { background-color: #e2e8f0 !important; }
 
-<<<<<<< HEAD
-/* Opacity variants */
-=======
 /* Opacity variants used in the app */
->>>>>>> main
 html.light .bg-zinc-900\/95 { background-color: rgba(255,255,255,0.95) !important; }
 html.light .bg-zinc-800\/80 { background-color: rgba(241,245,249,0.8) !important; }
 
@@ -90,11 +82,7 @@ html.light .border-zinc-800 { border-color: #e2e8f0 !important; }
 html.light .border-zinc-700 { border-color: #cbd5e1 !important; }
 
 /* Text */
-<<<<<<< HEAD
-html.light .text-white   { color: #0f172a !important; }
-=======
 html.light .text-white  { color: #0f172a !important; }
->>>>>>> main
 html.light .text-zinc-300 { color: #334155 !important; }
 html.light .text-zinc-400 { color: #475569 !important; }
 html.light .text-zinc-500 { color: #64748b !important; }
@@ -104,23 +92,11 @@ html.light .text-zinc-700 { color: #cbd5e1 !important; }
 /* Placeholder */
 html.light .placeholder-zinc-500::placeholder { color: #94a3b8 !important; }
 
-<<<<<<< HEAD
-/* Canvas workspace */
-html.light .canvas-workspace {
-  background-color: #e2e8f0 !important;
-  background-image:
-    linear-gradient(45deg, #cbd5e1 25%, transparent 25%),
-    linear-gradient(-45deg, #cbd5e1 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #cbd5e1 75%),
-    linear-gradient(-45deg, transparent 75%, #cbd5e1 75%) !important;
-}
-=======
 /* Separators */
 html.light .bg-zinc-700.w-px { background-color: #e2e8f0 !important; }
 
 /* Canvas area */
 html.light .canvas-workspace { background-color: #e2e8f0 !important; }
->>>>>>> main
 
 /* Scrollbar */
 html.light ::-webkit-scrollbar-thumb { background: #cbd5e1; }

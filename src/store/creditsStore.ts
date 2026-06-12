@@ -27,6 +27,9 @@ const PLAN_CREDITS: Record<Plan, number> = {
   team: Infinity,
 };
 
+// Infinity is not JSON-serialisable; use this sentinel for the "team" display value.
+const TEAM_CREDITS_DISPLAY = 999_999;
+
 export const useCreditsStore = create<CreditsState>()(
   persist(
     (set, get) => ({
@@ -57,7 +60,7 @@ export const useCreditsStore = create<CreditsState>()(
         set((s) => ({ credits: Math.min(s.credits + amount, PLAN_CREDITS[s.plan]) })),
 
       setPlan: (plan) =>
-        set({ plan, credits: PLAN_CREDITS[plan] === Infinity ? 999999 : PLAN_CREDITS[plan] }),
+        set({ plan, credits: PLAN_CREDITS[plan] === Infinity ? TEAM_CREDITS_DISPLAY : PLAN_CREDITS[plan] }),
     }),
     { name: "layra-credits" }
   )

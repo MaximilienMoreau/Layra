@@ -48,6 +48,7 @@ export function PromptBar() {
 
   return (
     <div>
+      {/* Main prompt bar */}
       <div className="bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3">
         {/* Suggestions (shown when empty) */}
         {prompt.length === 0 && !isGenerating && (
@@ -56,18 +57,26 @@ export function PromptBar() {
               <button
                 key={s}
 <<<<<<< HEAD
+<<<<<<< HEAD
                 onClick={() => applySuggestion(s)}
 =======
                 onClick={() => useSuggestion(s)}
 >>>>>>> main
                 className="text-xs bg-zinc-800 hover:bg-rose-950/60 border border-zinc-700 hover:border-rose-800 text-zinc-400 hover:text-rose-200 px-3 py-1.5 rounded-full transition-colors"
+=======
+                onClick={() => applySuggestion(s)}
+                className="text-xs bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700 text-zinc-400 hover:text-white px-3 py-1.5 rounded-full transition-colors"
+>>>>>>> features-implementations
               >
                 {s}
               </button>
             ))}
           </div>
         )}
+<<<<<<< HEAD
 
+=======
+>>>>>>> features-implementations
         <div className="flex items-end gap-3 max-w-4xl mx-auto">
           {/* Mode toggle (new vs reprompt) */}
           {hasCanvas && (

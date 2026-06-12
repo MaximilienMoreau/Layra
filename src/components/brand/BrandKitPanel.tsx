@@ -185,10 +185,13 @@ export function BrandKitPanel() {
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) {
-                  const url = URL.createObjectURL(file);
-                  updateActiveBrand({ logoUrl: url });
-                }
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  const dataUrl = ev.target?.result as string;
+                  if (dataUrl) updateActiveBrand({ logoUrl: dataUrl });
+                };
+                reader.readAsDataURL(file);
               }}
             />
           </label>

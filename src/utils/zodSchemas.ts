@@ -3,8 +3,8 @@ import { z } from "zod";
 export const PositionSchema = z.object({
   x: z.number(),
   y: z.number(),
-  width: z.number(),
-  height: z.number(),
+  width: z.number().positive(),
+  height: z.number().positive(),
 });
 
 export const TextStyleSchema = z.object({

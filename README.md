@@ -13,17 +13,15 @@ Layra is a no-code AI visual creation web app. Describe what you want in plain t
 | Validation | Zod v4 |
 | AI | Claude API (`@anthropic-ai/sdk`) |
 | Persistence | Supabase (optional) |
-| Vectorization | imagetracerjs (local) · Vectorizer.ai (AI) |
 
 ## Features
 
-- **AI generation** — describe a design in natural language, Claude generates a structured JSON layout that is applied directly to the Fabric.js canvas
+- **AI generation** — describe a design in natural language; Claude generates a structured JSON layout applied directly to the Fabric.js canvas
 - **Canvas editor** — drag, resize, and edit text, shapes, and images; undo/redo; keyboard shortcuts (Ctrl+Z / Ctrl+Y / Delete)
 - **Layer panel** — reorder, show/hide, and lock individual elements
 - **Properties panel** — live-edit font, colour, opacity, and position
 - **Brand kit** — save colours, fonts, and logo; optionally lock them so the AI always respects them
 - **5 starter templates** — Instagram gradient, LinkedIn pro, Minimal dark, Promo flash, YouTube thumbnail
-- **Vectorizer** — convert raster images to SVG locally (free, via imagetracerjs) or with AI precision (Vectorizer.ai, 15 credits)
 - **Export** — PNG and JPEG download
 - **Credits system** — free: 500 credits · pro: 3 000 · team: unlimited; enforced both client-side and server-side
 
@@ -34,15 +32,14 @@ src/
 ├── app/
 │   ├── page.tsx              # Main editor page
 │   └── api/
-│       ├── claude/           # POST /api/claude — AI layout generation
-│       └── vectorize/        # POST /api/vectorize — Vectorizer.ai proxy
+│       └── claude/           # POST /api/claude — AI layout generation
 ├── components/
 │   ├── ai/                   # GenerationOverlay, PromptBar
 │   ├── brand/                # BrandKitPanel
 │   ├── canvas/               # CanvasEditor, Toolbar, LayerPanel, PropertiesPanel
-│   ├── editor/               # EditorShell, ExportModal
-│   ├── templates/            # TemplatesPanel
-│   └── vectorize/            # VectorizerModal
+│   ├── editor/               # EditorLayout
+│   ├── export/               # ExportModal
+│   └── templates/            # TemplateGallery
 ├── hooks/
 │   ├── useAI.ts              # Orchestrates prompt → generation → canvas load
 │   ├── useCanvas.ts          # Fabric.js lifecycle, add/delete/export helpers
@@ -88,8 +85,6 @@ cp .env.local.example .env.local
 | `LAYRA_API_SECRET` | No | Shared secret to protect `/api/claude` from external calls |
 | `NEXT_PUBLIC_SUPABASE_URL` | No | Enables design persistence and server-side credits |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | No | Supabase anon key |
-| `VECTORIZER_API_ID` | No | Vectorizer.ai API ID (AI vectorization mode) |
-| `VECTORIZER_API_SECRET` | No | Vectorizer.ai API secret |
 | `REPLICATE_API_TOKEN` | No | Future: image generation |
 | `RUNWAY_API_KEY` | No | Future: video generation |
 
@@ -135,7 +130,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 1. User types a prompt in the **Prompt Bar** and clicks Generate
 2. `useAI` calls `generateLayout()` in `src/api/claude.ts`, which posts to `/api/claude`
-3. The API route validates credits server-side, then calls the Claude API with a structured system prompt
+3. The API route validates the session and credits server-side, then calls the Claude API with a structured system prompt
 4. Claude returns a JSON layout (background + elements array with positions, styles, z-indices)
 5. The response is validated with Zod (`ClaudeLayoutSchema`)
 6. `jsonToCanvas()` translates the layout into Fabric.js objects and renders them on the canvas

@@ -90,6 +90,15 @@ export function EditorLayout() {
     []
   );
 
+  const updateActiveObjectStyle = useCallback((styles: Record<string, unknown>) => {
+    canvasEditorRef.current?.updateActiveObjectStyle(styles);
+  }, []);
+
+  const handleApplyTemplate = useCallback(async (template: Template) => {
+    useCanvasStore.getState().setFormat(template.format);
+    await canvasEditorRef.current?.loadLayout(template.layout);
+  }, []);
+
   const leftTabs = [
     { id: "layers" as LeftTab, icon: Layers, label: "Calques" },
     { id: "brand" as LeftTab, icon: Palette, label: "Marque" },
@@ -182,7 +191,6 @@ export function EditorLayout() {
           )}>
             {leftOpen ? (
               <div className="flex flex-col w-full">
-                {/* Tabs */}
                 <div className="flex border-b border-zinc-800">
                   {leftTabs.map((t) => (
                     <button
@@ -315,7 +323,6 @@ export function EditorLayout() {
         )}
       </div>
 
-      {/* Export modal */}
       {showExport && (
         <ExportModal
           onClose={() => setShowExport(false)}

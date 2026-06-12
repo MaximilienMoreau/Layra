@@ -56,27 +56,14 @@ export function PromptBar() {
             {SUGGESTIONS.slice(0, 4).map((s) => (
               <button
                 key={s}
-<<<<<<< HEAD
-<<<<<<< HEAD
                 onClick={() => applySuggestion(s)}
-=======
-                onClick={() => useSuggestion(s)}
->>>>>>> main
                 className="text-xs bg-zinc-800 hover:bg-rose-950/60 border border-zinc-700 hover:border-rose-800 text-zinc-400 hover:text-rose-200 px-3 py-1.5 rounded-full transition-colors"
-=======
-                onClick={() => applySuggestion(s)}
-                className="text-xs bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700 text-zinc-400 hover:text-white px-3 py-1.5 rounded-full transition-colors"
->>>>>>> features-implementations
               >
                 {s}
               </button>
             ))}
           </div>
         )}
-<<<<<<< HEAD
-
-=======
->>>>>>> features-implementations
         <div className="flex items-end gap-3 max-w-4xl mx-auto">
           {/* Mode toggle (new vs reprompt) */}
           {hasCanvas && (

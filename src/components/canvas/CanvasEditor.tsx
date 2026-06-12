@@ -134,10 +134,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
 
   return (
     <div className="flex flex-col h-full bg-zinc-950">
-<<<<<<< HEAD
-=======
       {/* Format selector bar */}
->>>>>>> main
       <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border-b border-zinc-800 overflow-x-auto">
         <span className="text-xs text-zinc-500 shrink-0">Format :</span>
         {CANVAS_FORMATS.map((f) => (
@@ -172,16 +169,6 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
 
         <div
           ref={containerRef}
-<<<<<<< HEAD
-          className="flex-1 flex items-center justify-center canvas-workspace overflow-hidden relative"
-        >
-          {(isGenerating || generationError) && (
-            <GenerationOverlay
-              progress={generationProgress}
-              isError={!!generationError}
-              onDismiss={generationError ? () => setGenerationError(null) : undefined}
-            />
-=======
           className="flex-1 flex items-center justify-center bg-zinc-950 overflow-hidden relative"
         >
           {/* Loading overlay */}
@@ -195,7 +182,6 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
                 </div>
               </div>
             </div>
->>>>>>> main
           )}
 
           <div
@@ -205,10 +191,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
             <canvas ref={canvasRef} />
           </div>
 
-<<<<<<< HEAD
-=======
           {/* Scale indicator */}
->>>>>>> main
           <div className="absolute bottom-4 right-4 text-xs text-zinc-600 bg-zinc-900 px-2 py-1 rounded-md">
             {Math.round(scale * 100)}% — {format.width}×{format.height}px
           </div>

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${inter.variable} h-full antialiased dark`}>
+    <html lang="fr" className={`${inter.variable} h-full antialiased dark`} suppressHydrationWarning>
       <head>
         <link
           rel="preconnect"
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="h-full bg-gray-950 text-white overflow-hidden">
+      <body className="h-full bg-zinc-950 text-white overflow-hidden">
         {children}
       </body>
     </html>

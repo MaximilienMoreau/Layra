@@ -47,7 +47,7 @@ export function BrandKitPanel() {
       </section>
 
       {/* Lock brand */}
-      <section>
+      <section className="flex flex-col gap-1.5">
         <button
           onClick={() => updateActiveBrand({ locked: !activeBrand.locked })}
           className={cn(
@@ -60,9 +60,19 @@ export function BrandKitPanel() {
           {activeBrand.locked ? <Lock size={14} /> : <Unlock size={14} />}
           {activeBrand.locked ? "Marque verrouillée" : "Verrouiller la marque"}
           <span className="ml-auto text-xs opacity-60">
-            {activeBrand.locked ? "IA respecte les couleurs" : "IA est libre"}
+            {activeBrand.locked ? "Actif" : "Inactif"}
           </span>
         </button>
+
+        {/* Explication contextuelle */}
+        <p className={cn(
+          "text-xs px-1 leading-relaxed transition-colors",
+          activeBrand.locked ? "text-indigo-400" : "text-gray-600"
+        )}>
+          {activeBrand.locked
+            ? "Verrouillé : Claude utilise exclusivement votre palette et vos polices lors de la génération."
+            : "Déverrouillé : Claude peut choisir librement couleurs et polices."}
+        </p>
       </section>
 
       {/* Colors */}

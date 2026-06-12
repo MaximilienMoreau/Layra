@@ -41,7 +41,7 @@ export function PromptBar() {
     }
   }
 
-  function useSuggestion(s: string) {
+  function applySuggestion(s: string) {
     setPrompt(s);
     textareaRef.current?.focus();
   }
@@ -55,7 +55,11 @@ export function PromptBar() {
             {SUGGESTIONS.slice(0, 4).map((s) => (
               <button
                 key={s}
+<<<<<<< HEAD
+                onClick={() => applySuggestion(s)}
+=======
                 onClick={() => useSuggestion(s)}
+>>>>>>> main
                 className="text-xs bg-zinc-800 hover:bg-rose-950/60 border border-zinc-700 hover:border-rose-800 text-zinc-400 hover:text-rose-200 px-3 py-1.5 rounded-full transition-colors"
               >
                 {s}

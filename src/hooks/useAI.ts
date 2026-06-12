@@ -6,6 +6,7 @@ import { useBrandStore } from "@/store/brandStore";
 import { useCreditsStore } from "@/store/creditsStore";
 import { generateLayout } from "@/api/claude";
 import { canvasToJson } from "@/utils/canvasToJson";
+import { useDesignPersistence } from "@/hooks/useDesignPersistence";
 import type { ClaudeLayout } from "@/utils/zodSchemas";
 import type { Canvas as FabricCanvas } from "fabric";
 
@@ -13,18 +14,21 @@ export function useAI(
   fabricRef: React.RefObject<FabricCanvas | null>,
   loadLayout: (layout: ClaudeLayout) => Promise<void>
 ) {
-  const { format, setIsGenerating, setGenerationProgress } = useCanvasStore();
+  const { format, setIsGenerating, setGenerationProgress, setGenerationError } =
+    useCanvasStore();
   const { activeBrand } = useBrandStore();
   const { canUse, spend } = useCreditsStore();
+  const { saveDesign } = useDesignPersistence();
 
   const generate = useCallback(
     async (prompt: string, isReprompt = false) => {
       if (!canUse("generate_design")) {
-        alert("Crédits insuffisants. Passez à un plan supérieur.");
+        setGenerationError("Crédits insuffisants. Passez à un plan supérieur.");
         return;
       }
 
       setIsGenerating(true);
+      setGenerationError(null);
       setGenerationProgress("Analyse du prompt...");
 
       try {
@@ -33,7 +37,7 @@ export function useAI(
             ? canvasToJson(fabricRef.current)
             : undefined;
 
-        setGenerationProgress("Génération du layout avec Claude...");
+        setGenerationProgress("Génération avec Claude...");
 
         const layout = await generateLayout({
           userPrompt: prompt,
@@ -45,10 +49,17 @@ export function useAI(
         setGenerationProgress("Application du design...");
         await loadLayout(layout);
         spend("generate_design");
+
+        // Persistance silencieuse — ne bloque pas si Supabase n'est pas configuré
+        saveDesign(layout, format, prompt.slice(0, 60) || "Design généré").catch((e) => {
+          console.error("[AI] saveDesign unexpected error:", e);
+        });
+
         setGenerationProgress("Terminé !");
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Erreur inconnue";
-        setGenerationProgress(`Erreur : ${msg}`);
+        setGenerationError(msg);
+        setGenerationProgress("");
         console.error("[AI Generate]", err);
       } finally {
         setTimeout(() => {
@@ -57,7 +68,18 @@ export function useAI(
         }, 1500);
       }
     },
-    [canUse, spend, format, activeBrand, fabricRef, loadLayout, setIsGenerating, setGenerationProgress]
+    [
+      canUse,
+      spend,
+      format,
+      activeBrand,
+      fabricRef,
+      loadLayout,
+      saveDesign,
+      setIsGenerating,
+      setGenerationProgress,
+      setGenerationError,
+    ]
   );
 
   return { generate };

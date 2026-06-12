@@ -34,6 +34,7 @@ type CanvasState = {
   historyIndex: number;
   isGenerating: boolean;
   generationProgress: string;
+  generationError: string | null;
   activeView: "canvas" | "video" | "templates";
 
   setFormat: (format: CanvasFormat) => void;
@@ -46,6 +47,7 @@ type CanvasState = {
   redo: () => ClaudeLayout | null;
   setIsGenerating: (v: boolean) => void;
   setGenerationProgress: (msg: string) => void;
+  setGenerationError: (err: string | null) => void;
   setActiveView: (view: "canvas" | "video" | "templates") => void;
   updateLayerVisibility: (id: string, visible: boolean) => void;
   updateLayerLock: (id: string, locked: boolean) => void;
@@ -62,6 +64,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   historyIndex: -1,
   isGenerating: false,
   generationProgress: "",
+  generationError: null,
   activeView: "canvas",
 
   setFormat: (format) => set({ format }),
@@ -74,7 +77,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const { history, historyIndex } = get();
     const newHistory = history.slice(0, historyIndex + 1);
     newHistory.push(layout);
-    if (newHistory.length > 50) newHistory.shift();
+    if (newHistory.length > 100) newHistory.shift();
     set({ history: newHistory, historyIndex: newHistory.length - 1 });
   },
 
@@ -96,6 +99,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
   setIsGenerating: (isGenerating) => set({ isGenerating }),
   setGenerationProgress: (generationProgress) => set({ generationProgress }),
+  setGenerationError: (generationError) => set({ generationError }),
   setActiveView: (activeView) => set({ activeView }),
 
   updateLayerVisibility: (id, visible) => {

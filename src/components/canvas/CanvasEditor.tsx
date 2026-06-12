@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
+import { Loader2 } from "lucide-react";
 import { useCanvas } from "@/hooks/useCanvas";
 import { useHistory } from "@/hooks/useHistory";
 import { useAI } from "@/hooks/useAI";
@@ -24,9 +25,7 @@ export type CanvasEditorHandle = {
   addSvg: (svgString: string) => Promise<void>;
 };
 
-type CanvasEditorProps = { onVectorize: () => void };
-
-export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({ onVectorize }, ref) => {
+export const CanvasEditor = forwardRef<CanvasEditorHandle>((_, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -159,7 +158,7 @@ export const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(({
           onAddText={() => { addText(); setActiveTool("select"); }}
           onAddShape={(t) => { addShape(t); setActiveTool("select"); }}
           onAddImage={handleAddImage}
-          onVectorize={onVectorize}
+
           onDelete={deleteSelected}
           onUndo={undo}
           onRedo={redo}

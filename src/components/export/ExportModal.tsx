@@ -16,7 +16,7 @@ type ExportFormat = "png" | "jpg" | "svg";
 export function ExportModal({ onClose, onExportPNG, onExportJPEG }: Props) {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>("png");
   const [isExporting, setIsExporting] = useState(false);
-  const { spend } = useCreditsStore();
+  const { spend, canUse } = useCreditsStore();
 
   const formats = [
     { id: "png" as ExportFormat, label: "PNG", desc: "Meilleure qualité, fond transparent", icon: Image },
@@ -34,7 +34,7 @@ export function ExportModal({ onClose, onExportPNG, onExportJPEG }: Props) {
         dataUrl = onExportJPEG();
       }
 
-      if (dataUrl) {
+      if (dataUrl && canUse("export_hd")) {
         const a = document.createElement("a");
         a.href = dataUrl;
         a.download = `layra-design-${Date.now()}.${selectedFormat}`;

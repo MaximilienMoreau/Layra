@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700;900&family=Poppins:wght@300;400;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700;900&family=Poppins:wght@300;400;600;700&family=Roboto:wght@300;400;700&family=Open+Sans:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Raleway:wght@300;400;600;700&family=Oswald:wght@300;400;500;700&family=Merriweather:wght@300;400;700&family=Source+Code+Pro:wght@400;500;700&family=DM+Sans:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;700&display=swap"
           rel="stylesheet"
         />
       </head>

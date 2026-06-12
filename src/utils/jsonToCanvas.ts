@@ -15,6 +15,33 @@ declare module "fabric" {
   }
 }
 
+function gradientCoords(
+  direction: string | undefined,
+  w: number,
+  h: number
+): { x1: number; y1: number; x2: number; y2: number } {
+  const d = (direction ?? "to bottom").toLowerCase().trim();
+  if (d === "to bottom") return { x1: 0, y1: 0, x2: 0, y2: h };
+  if (d === "to top") return { x1: 0, y1: h, x2: 0, y2: 0 };
+  if (d === "to right") return { x1: 0, y1: 0, x2: w, y2: 0 };
+  if (d === "to left") return { x1: w, y1: 0, x2: 0, y2: 0 };
+  if (d === "to bottom right" || d === "to right bottom") return { x1: 0, y1: 0, x2: w, y2: h };
+  if (d === "to bottom left" || d === "to left bottom") return { x1: w, y1: 0, x2: 0, y2: h };
+  if (d === "to top right" || d === "to right top") return { x1: 0, y1: h, x2: w, y2: 0 };
+  if (d === "to top left" || d === "to left top") return { x1: w, y1: h, x2: 0, y2: 0 };
+  const deg = parseFloat(d);
+  if (!isNaN(deg)) {
+    const rad = ((deg - 90) * Math.PI) / 180;
+    return {
+      x1: w / 2 - (Math.cos(rad) * w) / 2,
+      y1: h / 2 - (Math.sin(rad) * h) / 2,
+      x2: w / 2 + (Math.cos(rad) * w) / 2,
+      y2: h / 2 + (Math.sin(rad) * h) / 2,
+    };
+  }
+  return { x1: 0, y1: 0, x2: 0, y2: h };
+}
+
 async function createElement(
   element: CanvasElement,
   fabric: typeof import("fabric")
@@ -167,7 +194,7 @@ export async function jsonToCanvas(
     const gradient = new fabricModule.Gradient({
       type: "linear",
       gradientUnits: "pixels",
-      coords: { x1: 0, y1: 0, x2: canvas.width!, y2: canvas.height! },
+      coords: gradientCoords(background.gradient.direction, canvas.width!, canvas.height!),
       colorStops: [
         { offset: 0, color: background.gradient.from },
         { offset: 1, color: background.gradient.to },

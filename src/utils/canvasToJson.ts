@@ -5,7 +5,7 @@ export function canvasToJson(canvas: FabricCanvas): CanvasElement[] {
   const objects = canvas.getObjects();
   return objects
     .filter((obj) => obj.layra && obj.layra.elementType !== "background")
-    .map((obj, index) => {
+    .map((obj, index): CanvasElement | null => {
       const meta = obj.layra!;
       const base = {
         id: meta.id,
@@ -63,6 +63,7 @@ export function canvasToJson(canvas: FabricCanvas): CanvasElement[] {
         };
       }
 
-      return { ...base, type: "text" as const, content: "" };
-    });
+      return null;
+    })
+    .filter((e): e is CanvasElement => e !== null);
 }

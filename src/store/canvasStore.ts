@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { CanvasElement, Background, ClaudeLayout } from "@/utils/zodSchemas";
+import type { ClaudeLayout } from "@/utils/zodSchemas";
 
 export type CanvasFormat = {
   width: number;
@@ -26,8 +26,6 @@ export type LayerItem = {
 
 type CanvasState = {
   format: CanvasFormat;
-  elements: CanvasElement[];
-  background: Background;
   layers: LayerItem[];
   selectedLayerId: string | null;
   history: ClaudeLayout[];
@@ -35,11 +33,9 @@ type CanvasState = {
   isGenerating: boolean;
   generationProgress: string;
   generationError: string | null;
-  activeView: "canvas" | "video" | "templates";
+  activeView: "canvas" | "templates";
 
   setFormat: (format: CanvasFormat) => void;
-  setElements: (elements: CanvasElement[]) => void;
-  setBackground: (bg: Background) => void;
   setLayers: (layers: LayerItem[]) => void;
   setSelectedLayerId: (id: string | null) => void;
   pushHistory: (layout: ClaudeLayout) => void;
@@ -48,7 +44,7 @@ type CanvasState = {
   setIsGenerating: (v: boolean) => void;
   setGenerationProgress: (msg: string) => void;
   setGenerationError: (err: string | null) => void;
-  setActiveView: (view: "canvas" | "video" | "templates") => void;
+  setActiveView: (view: "canvas" | "templates") => void;
   updateLayerVisibility: (id: string, visible: boolean) => void;
   updateLayerLock: (id: string, locked: boolean) => void;
   reorderLayers: (layers: LayerItem[]) => void;
@@ -56,8 +52,6 @@ type CanvasState = {
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
   format: CANVAS_FORMATS[0],
-  elements: [],
-  background: { type: "color", value: "#1a1a2e" },
   layers: [],
   selectedLayerId: null,
   history: [],
@@ -68,8 +62,6 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   activeView: "canvas",
 
   setFormat: (format) => set({ format }),
-  setElements: (elements) => set({ elements }),
-  setBackground: (background) => set({ background }),
   setLayers: (layers) => set({ layers }),
   setSelectedLayerId: (selectedLayerId) => set({ selectedLayerId }),
 

@@ -15,12 +15,6 @@ export async function generateLayout(
 ): Promise<ClaudeLayout> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
 
-  // Transmets le secret côté client s'il est exposé en variable publique.
-  // En production, ce secret doit rester serveur-seul (LAYRA_API_SECRET sans
-  // le préfixe NEXT_PUBLIC_).  Ici on le lit uniquement si exposé explicitement.
-  const secret = process.env.NEXT_PUBLIC_LAYRA_API_SECRET;
-  if (secret) headers["x-layra-secret"] = secret;
-
   const locale =
     typeof navigator !== "undefined" ? navigator.language : "fr";
   const sessionId = getSessionId();

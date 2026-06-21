@@ -47,7 +47,6 @@ type CanvasState = {
   setActiveView: (view: "canvas" | "templates") => void;
   updateLayerVisibility: (id: string, visible: boolean) => void;
   updateLayerLock: (id: string, locked: boolean) => void;
-  reorderLayers: (layers: LayerItem[]) => void;
 };
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
@@ -107,6 +106,4 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     );
     set({ layers });
   },
-
-  reorderLayers: (layers) => set({ layers }),
 }));

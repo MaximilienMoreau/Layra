@@ -13,13 +13,6 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
 
 // ---------------------------------------------------------------------------
-// Clé secrète côté serveur pour protéger la route d'un appel externe brut.
-// Positionnez LAYRA_API_SECRET dans .env.local. Si absente, la protection
-// est désactivée (acceptable en développement local).
-// ---------------------------------------------------------------------------
-const API_SECRET = process.env.LAYRA_API_SECRET;
-
-// ---------------------------------------------------------------------------
 // System prompt paramétrable par locale.
 // Ajoutez d'autres locales ici si besoin.
 // ---------------------------------------------------------------------------
@@ -140,14 +133,6 @@ DESIGN TIPS:
 // POST /api/claude
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
-  // --- Authentification légère ---
-  if (API_SECRET) {
-    const authHeader = req.headers.get("x-layra-secret");
-    if (authHeader !== API_SECRET) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
-  }
-
   try {
     const body = await req.json();
     const { userPrompt, format, brandKit, currentCanvas, locale = "fr", sessionId } = body;

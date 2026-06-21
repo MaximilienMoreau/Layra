@@ -3,17 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useCanvasStore } from "@/store/canvasStore";
 import { Settings2 } from "lucide-react";
+import { GOOGLE_FONTS } from "@/lib/fonts";
 
 type Props = {
   getActiveObject: () => import("fabric").FabricObject | null;
   updateStyle: (styles: Record<string, unknown>) => void;
 };
-
-const GOOGLE_FONTS = [
-  "Inter", "Roboto", "Playfair Display", "Montserrat", "Poppins",
-  "Open Sans", "Lato", "Raleway", "Oswald", "Merriweather",
-  "Source Code Pro", "DM Sans", "Space Grotesk",
-];
 
 export function PropertiesPanel({ getActiveObject, updateStyle }: Props) {
   const { selectedLayerId } = useCanvasStore();

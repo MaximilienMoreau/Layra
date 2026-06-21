@@ -1,15 +1,5 @@
-/**
- * Validation et décompte des crédits côté serveur.
- *
- * - En développement (pas de Supabase configuré) : stockage en mémoire du
- *   processus Node. Les compteurs sont réinitialisés à chaque redémarrage du
- *   serveur — suffisant pour le dev.
- * - En production : les compteurs sont persistés dans la table Supabase
- *   `session_credits`. La table est créée automatiquement si elle n'existe pas
- *   (via upsert + RLS permissif sur anon key).
- */
-
 import { CREDIT_COSTS } from "@/store/creditsStore";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type Action = keyof typeof CREDIT_COSTS;
 
@@ -21,8 +11,7 @@ const FREE_CREDITS = 500;
 const memStore = new Map<string, number>();
 
 function memCanUse(sessionId: string, action: Action): boolean {
-  const remaining = memStore.get(sessionId) ?? FREE_CREDITS;
-  return remaining >= CREDIT_COSTS[action];
+  return (memStore.get(sessionId) ?? FREE_CREDITS) >= CREDIT_COSTS[action];
 }
 
 function memSpend(sessionId: string, action: Action): boolean {
@@ -34,14 +23,18 @@ function memSpend(sessionId: string, action: Action): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Supabase backend
+// Supabase backend — singleton pour éviter une connexion par requête
 // ---------------------------------------------------------------------------
-async function getSupabase() {
+let _sb: SupabaseClient | null = null;
+
+async function getSupabase(): Promise<SupabaseClient | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return null;
+  if (_sb) return _sb;
   const { createClient } = await import("@supabase/supabase-js");
-  return createClient(url, key);
+  _sb = createClient(url, key);
+  return _sb;
 }
 
 async function supabaseCanUse(sessionId: string, action: Action): Promise<boolean> {
@@ -54,7 +47,7 @@ async function supabaseCanUse(sessionId: string, action: Action): Promise<boolea
     .eq("session_id", sessionId)
     .single();
 
-  if (error || !data) return CREDIT_COSTS[action] <= FREE_CREDITS; // première utilisation
+  if (error || !data) return CREDIT_COSTS[action] <= FREE_CREDITS;
   return data.credits >= CREDIT_COSTS[action];
 }
 
@@ -64,7 +57,6 @@ async function supabaseSpend(sessionId: string, action: Action): Promise<boolean
 
   const cost = CREDIT_COSTS[action];
 
-  // Upsert : insère la ligne si elle n'existe pas encore
   const { data: existing } = await sb
     .from("session_credits")
     .select("credits")

@@ -9,9 +9,8 @@ type Action = keyof typeof CREDIT_COSTS;
 
 type CreditsState = {
   credits: number;
-  canUse: (action: Action) => boolean;
-  spend: (action: Action) => boolean;
-  addCredits: (amount: number) => void;
+  canUse:  (action: Action) => boolean;
+  spend:   (action: Action) => boolean;
 };
 
 const FREE_CREDITS = 500;
@@ -29,9 +28,6 @@ export const useCreditsStore = create<CreditsState>()(
         set((s) => ({ credits: s.credits - cost }));
         return true;
       },
-
-      addCredits: (amount) =>
-        set((s) => ({ credits: Math.min(s.credits + amount, FREE_CREDITS) })),
     }),
     { name: "layra-credits" }
   )

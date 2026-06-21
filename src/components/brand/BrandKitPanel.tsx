@@ -4,12 +4,7 @@ import { useState } from "react";
 import { useBrandStore } from "@/store/brandStore";
 import { Palette, Type, Lock, Unlock, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const GOOGLE_FONTS = [
-  "Inter", "Roboto", "Playfair Display", "Montserrat", "Poppins",
-  "Open Sans", "Lato", "Raleway", "Oswald", "Merriweather",
-  "Source Code Pro", "DM Sans", "Space Grotesk",
-];
+import { GOOGLE_FONTS } from "@/lib/fonts";
 
 export function BrandKitPanel() {
   const { activeBrand, updateActiveBrand } = useBrandStore();

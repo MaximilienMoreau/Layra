@@ -78,10 +78,31 @@ export function useCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Resize canvas when format changes
+  // Resize canvas when format changes — rescale existing objects proportionally
   useEffect(() => {
     const canvas = fabricRef.current;
     if (!canvas) return;
+
+    const prevWidth = canvas.width ?? format.width;
+    const prevHeight = canvas.height ?? format.height;
+
+    if (
+      (prevWidth !== format.width || prevHeight !== format.height) &&
+      canvas.getObjects().length > 0
+    ) {
+      const scaleX = format.width / prevWidth;
+      const scaleY = format.height / prevHeight;
+      canvas.getObjects().forEach((obj) => {
+        obj.set({
+          left: (obj.left ?? 0) * scaleX,
+          top: (obj.top ?? 0) * scaleY,
+          scaleX: (obj.scaleX ?? 1) * scaleX,
+          scaleY: (obj.scaleY ?? 1) * scaleY,
+        });
+        obj.setCoords();
+      });
+    }
+
     canvas.set({ width: format.width, height: format.height });
     canvas.renderAll();
   }, [format]);

@@ -13,7 +13,7 @@ const STEPS: Step[] = [
 function stepsFromProgress(progress: string): Step[] {
   const p = progress.toLowerCase();
   return STEPS.map((s, i) => {
-    if (i === 0) return { ...s, done: !p.includes("analyse") };
+    if (i === 0) return { ...s, done: p.includes("génération") || p.includes("claude") || p.includes("application") || p.includes("terminé") };
     if (i === 1) return { ...s, done: p.includes("application") || p.includes("terminé") };
     if (i === 2) return { ...s, done: p.includes("terminé") };
     return s;

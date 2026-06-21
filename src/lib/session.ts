@@ -16,10 +16,14 @@ function generateId(): string {
 
 export function getSessionId(): string {
   if (typeof window === "undefined") return "ssr";
-  let id = localStorage.getItem(SESSION_KEY);
-  if (!id) {
-    id = generateId();
-    localStorage.setItem(SESSION_KEY, id);
+  try {
+    let id = localStorage.getItem(SESSION_KEY);
+    if (!id) {
+      id = generateId();
+      localStorage.setItem(SESSION_KEY, id);
+    }
+    return id;
+  } catch {
+    return generateId();
   }
-  return id;
 }

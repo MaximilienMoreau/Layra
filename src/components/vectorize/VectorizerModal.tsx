@@ -43,12 +43,14 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
   const svgPreviewUrlRef = useRef<string | null>(null);
+  const vectorizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { spend, canUse } = useCreditsStore();
 
   useEffect(() => {
     return () => {
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       if (svgPreviewUrlRef.current) URL.revokeObjectURL(svgPreviewUrlRef.current);
+      if (vectorizeTimeoutRef.current) clearTimeout(vectorizeTimeoutRef.current);
     };
   }, []);
 
@@ -99,14 +101,14 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
       const ImageTracer = await import("imagetracerjs");
       const tracer = (ImageTracer as unknown as { default?: typeof ImageTracer }).default ?? ImageTracer;
       const svg = await new Promise<string>((resolve, reject) => {
-        const timeout = setTimeout(
+        vectorizeTimeoutRef.current = setTimeout(
           () => reject(new Error("Timeout : vectorisation trop longue (>30s)")),
           30_000
         );
         (tracer as typeof ImageTracer).imageToSVG(
           previewUrl,
           (svgString: string) => {
-            clearTimeout(timeout);
+            if (vectorizeTimeoutRef.current) clearTimeout(vectorizeTimeoutRef.current);
             if (!svgString) reject(new Error("Résultat vide"));
             else resolve(svgString);
           },

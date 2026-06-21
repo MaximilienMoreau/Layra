@@ -1,150 +1,117 @@
-# Layra
+<div align="center">
 
-Layra is a no-code AI visual creation web app. Describe what you want in plain text, and Layra generates a ready-to-use graphic design — Instagram posts, LinkedIn banners, YouTube thumbnails, promotional flyers, and more.
+# ⚡ Layra
 
-## Stack
+**Convertissez vos images PNG & JPEG en SVG vectoriels parfaits.**
+Deux modes : traitement local gratuit, ou vectorisation IA haute qualité.
 
-| Layer | Technology |
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38BDF8?style=flat-square&logo=tailwindcss)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
+
+</div>
+
+---
+
+## ✨ Fonctionnalités
+
+| | |
 |---|---|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| UI | React 19, Tailwind CSS v4, Radix UI |
-| Canvas | Fabric.js v7 |
-| State | Zustand v5 |
-| Validation | Zod v4 |
-| AI | Claude API (`@anthropic-ai/sdk`) |
-| Persistence | Supabase (optional) |
+| ⚡ **Mode Rapide** | Traitement 100% local via `imagetracerjs` — gratuit, aucune donnée envoyée |
+| ✦ **Mode IA** | Résultats haute qualité sur photos et visuels complexes via API externe |
+| 🖱️ **Drag & drop** | Glissez votre image ou cliquez pour sélectionner (PNG, JPEG, WebP) |
+| 🔍 **Aperçu avant/après** | Comparaison côte à côte avec fond damier pour la transparence SVG |
+| ⬇️ **Téléchargement direct** | Fichier `.svg` propre, léger, scalable à l'infini |
+| 🪙 **Crédits** | 500 crédits gratuits · 15 crédits par vectorisation IA |
 
-## Features
+---
 
-- **AI generation** — describe a design in natural language; Claude generates a structured JSON layout applied directly to the Fabric.js canvas
-- **Canvas editor** — drag, resize, and edit text, shapes, and images; undo/redo; keyboard shortcuts (Ctrl+Z / Ctrl+Y / Delete)
-- **Layer panel** — reorder, show/hide, and lock individual elements
-- **Properties panel** — live-edit font, colour, opacity, and position
-- **Brand kit** — save colours, fonts, and logo; optionally lock them so the AI always respects them
-- **5 starter templates** — Instagram gradient, LinkedIn pro, Minimal dark, Promo flash, YouTube thumbnail
-- **Export** — PNG and JPEG download
-- **Credits system** — free: 500 credits · pro: 3 000 · team: unlimited; enforced both client-side and server-side
+## 🚀 Démarrage rapide
 
-## Project structure
-
-```
-src/
-├── app/
-│   ├── page.tsx              # Main editor page
-│   └── api/
-│       └── claude/           # POST /api/claude — AI layout generation
-├── components/
-│   ├── ai/                   # GenerationOverlay, PromptBar
-│   ├── brand/                # BrandKitPanel
-│   ├── canvas/               # CanvasEditor, Toolbar, LayerPanel, PropertiesPanel
-│   ├── editor/               # EditorLayout
-│   ├── export/               # ExportModal
-│   └── templates/            # TemplateGallery
-├── hooks/
-│   ├── useAI.ts              # Orchestrates prompt → generation → canvas load
-│   ├── useCanvas.ts          # Fabric.js lifecycle, add/delete/export helpers
-│   ├── useHistory.ts         # Undo/redo over ClaudeLayout snapshots
-│   └── useDesignPersistence.ts # Supabase CRUD for saved designs
-├── store/
-│   ├── canvasStore.ts        # Format, layers, generation state, history
-│   ├── brandStore.ts         # Brand kits
-│   ├── creditsStore.ts       # Credit balance and CREDIT_COSTS map
-│   └── themeStore.ts         # Dark/light mode
-├── utils/
-│   ├── jsonToCanvas.ts       # ClaudeLayout → Fabric objects
-│   ├── canvasToJson.ts       # Fabric objects → CanvasElement[] (for reprompt)
-│   └── zodSchemas.ts         # Zod schemas shared between client and API route
-├── lib/
-│   ├── serverCredits.ts      # Server-side credit validation and spend (Supabase or in-memory)
-│   ├── session.ts            # Anonymous session ID (localStorage)
-│   └── supabase.ts           # Supabase client singleton
-└── api/
-    └── claude.ts             # Client wrapper for /api/claude
-```
-
-## Getting started
-
-### 1. Install dependencies
+### 1 · Installer les dépendances
 
 ```bash
 npm install
 ```
 
-### 2. Configure environment variables
-
-Copy `.env.local.example` to `.env.local` and fill in at least the Anthropic key:
+### 2 · Configurer les variables d'environnement
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-| Variable | Required | Description |
+Éditez `.env.local` :
+
+| Variable | Requis | Description |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | **Yes** | Your Anthropic API key |
-| `ANTHROPIC_MODEL` | No | Model override (default: `claude-sonnet-4-6`) |
-| `LAYRA_API_SECRET` | No | Shared secret to protect `/api/claude` from external calls |
-| `NEXT_PUBLIC_SUPABASE_URL` | No | Enables design persistence and server-side credits |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | No | Supabase anon key |
-| `REPLICATE_API_TOKEN` | No | Future: image generation |
-| `RUNWAY_API_KEY` | No | Future: video generation |
+| `VECTORIZER_API_ID` | Mode IA uniquement | Identifiant de l'API de vectorisation |
+| `VECTORIZER_API_SECRET` | Mode IA uniquement | Secret de l'API de vectorisation |
+| `NEXT_PUBLIC_SUPABASE_URL` | Non | Persistance des crédits côté serveur |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Non | Clé Supabase anon |
 
-### 3. Set up Supabase (optional)
+> Sans les clés API, seul le **mode Rapide** (local, gratuit) est disponible.
+> Sans Supabase, les crédits sont suivis en mémoire Node.js (réinitialisés au redémarrage).
 
-If you want design persistence and server-side credit enforcement, create the two tables below in your Supabase project:
-
-```sql
--- Credit counters per anonymous session
-CREATE TABLE session_credits (
-  session_id  text PRIMARY KEY,
-  credits     integer NOT NULL DEFAULT 500,
-  updated_at  timestamptz DEFAULT now()
-);
-ALTER TABLE session_credits ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "anon_all" ON session_credits FOR ALL USING (true) WITH CHECK (true);
-
--- Saved designs
-CREATE TABLE designs (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id  text NOT NULL,
-  name        text NOT NULL DEFAULT 'Sans titre',
-  layout      jsonb NOT NULL,
-  format      jsonb NOT NULL,
-  created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now()
-);
-ALTER TABLE designs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "anon_all" ON designs FOR ALL USING (true) WITH CHECK (true);
-```
-
-Without Supabase, the app works fully — credits are tracked in Node.js process memory (reset on server restart) and designs are not persisted.
-
-### 4. Run the dev server
+### 3 · Lancer le serveur
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Ouvrez [http://localhost:3000](http://localhost:3000).
 
-## How the AI pipeline works
+> **WSL2** Le navigateur Windows accède au serveur via l'IP WSL2 : `http://172.x.x.x:3000`
 
-1. User types a prompt in the **Prompt Bar** and clicks Generate
-2. `useAI` calls `generateLayout()` in `src/api/claude.ts`, which posts to `/api/claude`
-3. The API route validates the session and credits server-side, then calls the Claude API with a structured system prompt
-4. Claude returns a JSON layout (background + elements array with positions, styles, z-indices)
-5. The response is validated with Zod (`ClaudeLayoutSchema`)
-6. `jsonToCanvas()` translates the layout into Fabric.js objects and renders them on the canvas
-7. Credits are deducted server-side after a successful generation
-8. The layout is saved to Supabase asynchronously (fire-and-forget)
+---
 
-For **reprompt** (modifying an existing design), `canvasToJson()` serialises the current canvas state and includes it in the Claude request so the model can make targeted modifications.
+## 🛠️ Stack technique
 
-## Roadmap
+| Couche | Technologie |
+|---|---|
+| Framework | Next.js 16 (App Router, webpack) |
+| UI | React 19, Tailwind CSS v4 |
+| Vectorisation locale | imagetracerjs |
+| Vectorisation IA | API externe (Basic Auth) |
+| État | Zustand v5 |
+| Persistance crédits | Supabase (optionnel) |
 
-- [ ] Supabase Auth (replace anonymous sessions)
-- [ ] Replicate image generation integration
-- [ ] Runway video generation integration
-- [ ] Remotion animation export
-- [ ] 20 templates
-- [ ] Onboarding flow
-- [ ] Billing and credit enforcement (Stripe)
+---
+
+## 📁 Structure du projet
+
+```
+src/
+├── app/
+│   ├── page.tsx              # Point d'entrée
+│   ├── globals.css           # Dark theme, .btn-accent, .checker
+│   ├── layout.tsx            # Layout racine & metadata
+│   └── api/vectorize/
+│       └── route.ts          # POST /api/vectorize — proxy API de vectorisation
+├── components/
+│   └── VectorizerApp.tsx     # Composant principal (toute l'UI)
+├── lib/
+│   ├── session.ts            # ID de session anonyme (localStorage)
+│   └── serverCredits.ts      # Validation & décompte crédits côté serveur
+├── store/
+│   └── creditsStore.ts       # État Zustand des crédits client
+└── types/
+    └── imagetracerjs.d.ts    # Types pour imagetracerjs
+```
+
+---
+
+## ⚙️ Comment ça fonctionne
+
+**Mode Rapide**
+
+1. L'utilisateur dépose une image et clique sur "Vectoriser"
+2. `imagetracerjs` traite l'image entièrement dans le navigateur
+3. Le SVG est généré instantanément — aucune donnée ne quitte l'appareil
+
+**Mode IA**
+
+1. L'image est envoyée à `POST /api/vectorize` avec un `sessionId`
+2. La route vérifie les crédits disponibles (Supabase ou mémoire)
+3. L'image est transmise à l'API externe avec authentification Basic Auth
+4. Le SVG est retourné au client et les crédits sont débités

@@ -10,63 +10,52 @@ type Props = {
   onLayerLock: (id: string, locked: boolean) => void;
 };
 
-const typeIcons = {
-  text: Type,
-  image: Image,
-  shape: Square,
-  video: Video,
-  background: Layers,
-};
+const typeIcons = { text: Type, image: Image, shape: Square, video: Video, background: Layers };
 
 export function LayerPanel({ onLayerSelect, onLayerVisible, onLayerLock }: Props) {
   const { layers, selectedLayerId } = useCanvasStore();
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-3 py-2 border-b border-zinc-800">
-        <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-          Calques
-        </h3>
+      <div className="px-3 py-2.5 border-b border-white/[0.06]">
+        <h3 className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Calques</h3>
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto p-1.5">
         {layers.length === 0 ? (
-          <div className="p-4 text-center text-zinc-600 text-sm">
-            <Layers size={24} className="mx-auto mb-2 opacity-40" />
-            Aucun calque
+          <div className="flex flex-col items-center gap-2 py-8 text-center">
+            <Layers size={20} className="text-white/10" />
+            <p className="text-xs text-white/20 font-medium">Aucun calque</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-0.5 p-1">
+          <div className="flex flex-col gap-0.5">
             {layers.map((layer: LayerItem) => {
               const Icon = typeIcons[layer.type] || Square;
+              const isSelected = selectedLayerId === layer.id;
               return (
                 <div
                   key={layer.id}
                   onClick={() => onLayerSelect(layer.id)}
                   className={cn(
-                    "flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors group",
-                    selectedLayerId === layer.id
-                      ? "bg-rose-900/50 border border-rose-700/50"
-                      : "hover:bg-zinc-800 border border-transparent"
+                    "flex items-center gap-2 px-2.5 py-1.5 rounded-lg cursor-pointer transition-all duration-150 group border",
+                    isSelected
+                      ? "bg-rose-500/[0.08] border-rose-500/20 text-white"
+                      : "hover:bg-white/[0.04] border-transparent text-white/50 hover:text-white/80"
                   )}
                 >
-                  <Icon size={13} className="text-zinc-500 shrink-0" />
-                  <span className="text-xs text-zinc-300 truncate flex-1 min-w-0">
-                    {layer.name}
-                  </span>
-                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Icon size={12} className={cn("shrink-0", isSelected ? "text-rose-400" : "text-white/25")} />
+                  <span className="text-xs font-medium truncate flex-1 min-w-0">{layer.name}</span>
+                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                     <button
                       onClick={(e) => { e.stopPropagation(); onLayerVisible(layer.id, !layer.visible); }}
-                      className="p-0.5 rounded text-zinc-500 hover:text-white transition-colors"
-                      title={layer.visible ? "Masquer" : "Afficher"}
+                      className="p-1 rounded text-white/25 hover:text-white transition-colors"
                     >
-                      {layer.visible ? <Eye size={12} /> : <EyeOff size={12} />}
+                      {layer.visible ? <Eye size={11} /> : <EyeOff size={11} />}
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); onLayerLock(layer.id, !layer.locked); }}
-                      className="p-0.5 rounded text-zinc-500 hover:text-white transition-colors"
-                      title={layer.locked ? "Déverrouiller" : "Verrouiller"}
+                      className="p-1 rounded text-white/25 hover:text-white transition-colors"
                     >
-                      {layer.locked ? <Lock size={12} /> : <Unlock size={12} />}
+                      {layer.locked ? <Lock size={11} /> : <Unlock size={11} />}
                     </button>
                   </div>
                 </div>

@@ -292,7 +292,7 @@ export function VectorizerModal({ onClose, onPlaceOnCanvas }: Props) {
         {/* Footer */}
         <div className="px-6 py-4 border-t border-zinc-800 flex items-center justify-between gap-2">
           <span className="text-xs text-zinc-600">
-            {mode === "fast" ? "Traitement local · aucune donnée envoyée" : "Via Vectorizer.ai · 15 crédits"}
+            {mode === "fast" ? "Traitement local · aucune donnée envoyée" : "Traitement IA · 15 crédits"}
           </span>
           <div className="flex gap-2">
             {status === "success" ? (

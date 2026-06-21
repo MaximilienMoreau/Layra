@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const text = await response.text();
       return NextResponse.json(
-        { error: `Vectorizer.ai : ${text}` },
+        { error: `Erreur API : ${text}` },
         { status: response.status }
       );
     }

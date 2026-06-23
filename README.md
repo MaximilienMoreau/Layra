@@ -23,6 +23,7 @@ Deux modes : traitement local gratuit, ou vectorisation IA haute qualité.
 | 🖱️ **Drag & drop** | Glissez votre image ou cliquez pour sélectionner (PNG, JPEG, WebP) |
 | 🔍 **Aperçu avant/après** | Comparaison côte à côte avec fond damier pour la transparence SVG |
 | ⬇️ **Téléchargement direct** | Fichier `.svg` propre, léger, scalable à l'infini |
+| 🌙 **Thème sombre / clair** | Bascule en un clic, préférence persistée dans `localStorage` |
 | 🪙 **Crédits** | 500 crédits gratuits · 15 crédits par vectorisation IA |
 
 ---
@@ -84,7 +85,7 @@ Ouvrez [http://localhost:3000](http://localhost:3000).
 src/
 ├── app/
 │   ├── page.tsx              # Point d'entrée
-│   ├── globals.css           # Dark theme, .btn-accent, .checker
+│   ├── globals.css           # Thème sombre/clair (CSS vars), .btn-accent, .checker
 │   ├── layout.tsx            # Layout racine & metadata
 │   └── api/vectorize/
 │       └── route.ts          # POST /api/vectorize — proxy API de vectorisation

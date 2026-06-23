@@ -401,7 +401,7 @@ export default function VectorizerApp() {
         {file && status !== "loading" && status !== "done" && (
           <button
             onClick={vectorize}
-            disabled={aiBlocked}
+
             className="btn-accent w-full mt-5 flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-base font-bold text-white shadow-2xl shadow-rose-500/20"
           >
             {mode === "fast" ? <Zap size={18} /> : <Sparkles size={18} />}

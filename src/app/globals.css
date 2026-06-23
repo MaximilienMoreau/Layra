@@ -65,6 +65,7 @@ html, body {
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--border-medium); }
 
+/* ── Accent button ── */
 .btn-accent {
   background: linear-gradient(135deg, #f97316, #e11d48 52%, #7c3aed);
   transition: filter 0.15s, transform 0.12s;
@@ -73,6 +74,7 @@ html, body {
 .btn-accent:active:not(:disabled) { transform: scale(0.97); }
 .btn-accent:disabled { opacity: 0.3; cursor: not-allowed; }
 
+/* ── Gradient text ── */
 .text-gradient {
   background: linear-gradient(135deg, #fb923c 10%, #f43f5e 55%, #a78bfa);
   -webkit-background-clip: text;
@@ -89,4 +91,26 @@ html, body {
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
   background-color: var(--checker-bg);
+}
+
+/* ── Result cards ── */
+.result-card {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #0d0d1a;
+}
+.result-card-header {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.result-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  min-height: 260px;
 }

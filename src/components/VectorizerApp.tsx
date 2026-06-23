@@ -380,7 +380,10 @@ export default function VectorizerApp() {
         )}
 
         {status === "error" && error && (
-          <div className="mt-4 flex items-start gap-3 px-4 py-3 rounded-xl" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
+          <div
+            className="mt-4 flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}
+          >
             <AlertCircle size={16} style={{ color: "#f87171", flexShrink: 0, marginTop: 1 }} />
             <div>
               <p className="text-sm font-semibold" style={{ color: "#f87171" }}>{error}</p>
@@ -398,6 +401,7 @@ export default function VectorizerApp() {
         {file && status !== "loading" && status !== "done" && (
           <button
             onClick={vectorize}
+            disabled={aiBlocked}
             className="btn-accent w-full mt-5 flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-base font-bold text-white shadow-2xl shadow-rose-500/20"
           >
             {mode === "fast" ? <Zap size={18} /> : <Sparkles size={18} />}

@@ -2,6 +2,49 @@
 
 :root {
   --font-inter: "Inter", system-ui, sans-serif;
+
+  /* Dark theme (default) */
+  --bg-base:        #09090f;
+  --bg-surface:     #0d0d1a;
+  --bg-header:      #0d0d16;
+  --bg-toggle:      #141420;
+  --bg-subtle:      rgba(255,255,255,0.06);
+  --bg-card:        rgba(255,255,255,0.03);
+  --bg-idle:        rgba(255,255,255,0.02);
+  --bg-active:      rgba(255,255,255,0.1);
+  --text-primary:   #f0f0ff;
+  --text-muted:     rgba(255,255,255,0.42);
+  --text-dim:       rgba(255,255,255,0.3);
+  --text-faint:     rgba(255,255,255,0.18);
+  --text-inactive:  rgba(255,255,255,0.35);
+  --border-subtle:  rgba(255,255,255,0.06);
+  --border-medium:  rgba(255,255,255,0.08);
+  --border-strong:  rgba(255,255,255,0.12);
+  --border-toggle:  rgba(255,255,255,0.07);
+  --checker-sq:     #1a1a2e;
+  --checker-bg:     #141428;
+}
+
+[data-theme="light"] {
+  --bg-base:        #f2f2f7;
+  --bg-surface:     #ffffff;
+  --bg-header:      #ffffff;
+  --bg-toggle:      #e4e4ef;
+  --bg-subtle:      rgba(0,0,0,0.05);
+  --bg-card:        rgba(0,0,0,0.025);
+  --bg-idle:        rgba(0,0,0,0.02);
+  --bg-active:      rgba(0,0,0,0.08);
+  --text-primary:   #0d0d1a;
+  --text-muted:     rgba(0,0,0,0.45);
+  --text-dim:       rgba(0,0,0,0.35);
+  --text-faint:     rgba(0,0,0,0.22);
+  --text-inactive:  rgba(0,0,0,0.3);
+  --border-subtle:  rgba(0,0,0,0.06);
+  --border-medium:  rgba(0,0,0,0.09);
+  --border-strong:  rgba(0,0,0,0.13);
+  --border-toggle:  rgba(0,0,0,0.09);
+  --checker-sq:     #d0d0e4;
+  --checker-bg:     #eaeaf4;
 }
 
 * { box-sizing: border-box; }
@@ -13,14 +56,14 @@ html, body {
   font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #09090f;
-  color: #f0f0ff;
+  background: var(--bg-base);
+  color: var(--text-primary);
 }
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-medium); }
 
 .btn-accent {
   background: linear-gradient(135deg, #f97316, #e11d48 52%, #7c3aed);
@@ -37,14 +80,13 @@ html, body {
   background-clip: text;
 }
 
-/* checkerboard pour le preview SVG (fond transparent) */
 .checker {
   background-image:
-    linear-gradient(45deg, #1a1a2e 25%, transparent 25%),
-    linear-gradient(-45deg, #1a1a2e 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #1a1a2e 75%),
-    linear-gradient(-45deg, transparent 75%, #1a1a2e 75%);
+    linear-gradient(45deg,  var(--checker-sq) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--checker-sq) 25%, transparent 25%),
+    linear-gradient(45deg,  transparent 75%, var(--checker-sq) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--checker-sq) 75%);
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
-  background-color: #141428;
+  background-color: var(--checker-bg);
 }

@@ -26,7 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#09090f",
+          background: "var(--bg-base)",
         }}
       >
         <div style={{ textAlign: "center", padding: 24 }}>
@@ -36,10 +36,10 @@ export class ErrorBoundary extends Component<Props, State> {
           <button
             onClick={() => this.setState({ hasError: false })}
             style={{
-              color: "rgba(255,255,255,0.4)",
+              color: "var(--text-muted)",
               fontSize: 13,
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              background: "var(--bg-subtle)",
+              border: "1px solid var(--border-medium)",
               borderRadius: 8,
               padding: "6px 16px",
               cursor: "pointer",

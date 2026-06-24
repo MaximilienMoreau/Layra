@@ -1,4 +1,4 @@
-import { CREDIT_COSTS } from "@/store/creditsStore";
+import { CREDIT_COSTS } from "@/lib/creditCosts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 type Action = keyof typeof CREDIT_COSTS;

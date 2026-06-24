@@ -1,8 +1,3 @@
-/**
- * Identifiant de session anonyme côté client.
- * Généré une fois, persisté dans localStorage.
- */
-
 const SESSION_KEY = "layra-session-id";
 
 function generateId(): string {

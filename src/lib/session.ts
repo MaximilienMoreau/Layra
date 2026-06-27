@@ -1,11 +1,9 @@
 const SESSION_KEY = "layra-session-id";
 
 function generateId(): string {
-  // crypto.randomUUID est disponible dans tous les navigateurs modernes et Node 19+
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return crypto.randomUUID();
   }
-  // Fallback minimal pour environnements anciens
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 

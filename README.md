@@ -2,7 +2,7 @@
 
 # ⚡ Layra
 
-**Convertissez vos images PNG & JPEG en SVG vectoriels parfaits.**
+**Convertissez vos images PNG, JPEG et WebP en SVG vectoriels parfaits.**
 Deux modes : traitement local gratuit, ou vectorisation IA haute qualité.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -18,7 +18,7 @@ Deux modes : traitement local gratuit, ou vectorisation IA haute qualité.
 |---|---|
 | ⚡ **Mode Rapide** | Traitement 100% local via `imagetracerjs` — gratuit, aucune donnée envoyée |
 | ✦ **Mode IA** | Résultats haute qualité sur photos et visuels complexes via API externe |
-| 🖱️ **Drag & drop** | Glissez votre image ou cliquez pour sélectionner (PNG, JPEG, WebP) |
+| 🖱️ **Drag & drop / Paste** | Glissez, cliquez ou collez une image (PNG, JPEG, WebP) |
 | 🔍 **Aperçu avant/après** | Comparaison côte à côte avec fond damier pour la transparence SVG |
 | ⬇️ **Téléchargement direct** | Fichier `.svg` propre, léger, scalable à l'infini |
 | 🌙 **Thème sombre / clair** | Bascule en un clic, préférence persistée dans `localStorage` |
@@ -44,8 +44,8 @@ cp .env.local.example .env.local
 |---|---|---|
 | `VECTORIZER_API_ID` | Mode IA uniquement | Identifiant de l'API de vectorisation |
 | `VECTORIZER_API_SECRET` | Mode IA uniquement | Secret de l'API de vectorisation |
-| `NEXT_PUBLIC_SUPABASE_URL` | Non | Persistance des crédits côté serveur |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Non | Clé Supabase anon |
+| `SUPABASE_URL` | Non | Persistance des crédits côté serveur |
+| `SUPABASE_ANON_KEY` | Non | Clé Supabase anon |
 
 > Sans les clés API, seul le **mode Rapide** (local, gratuit) est disponible.
 > Sans Supabase, les crédits sont suivis en mémoire Node.js (réinitialisés au redémarrage).
@@ -68,7 +68,6 @@ Ouvrez [http://localhost:3000](http://localhost:3000).
 | UI | React 19, Tailwind CSS v4 |
 | Vectorisation locale | imagetracerjs |
 | Vectorisation IA | API externe (Basic Auth) |
-| État | Zustand v5 |
 | Persistance crédits | Supabase (optionnel) |
 
 ## 📁 Structure du projet
@@ -76,20 +75,27 @@ Ouvrez [http://localhost:3000](http://localhost:3000).
 ```
 src/
 ├── app/
-│   ├── page.tsx              # Point d'entrée
-│   ├── globals.css           # Thème sombre/clair (CSS vars), .btn-accent, .checker
-│   ├── layout.tsx            # Layout racine & metadata
-│   └── api/vectorize/
-│       └── route.ts          # POST /api/vectorize — proxy API de vectorisation
+│   ├── page.tsx                    # Point d'entrée
+│   ├── globals.css                 # Thème sombre/clair, tokens couleur, .btn-accent
+│   ├── layout.tsx                  # Layout racine & metadata
+│   └── api/
+│       ├── vectorize/route.ts      # POST /api/vectorize — proxy vectorisation
+│       └── credits/route.ts        # GET  /api/credits  — solde de crédits
 ├── components/
-│   └── VectorizerApp.tsx     # Composant principal (toute l'UI)
+│   ├── VectorizerApp.tsx           # Orchestrateur principal
+│   ├── AppHeader.tsx               # Header, mode toggle, theme toggle
+│   ├── DropZone.tsx                # Zone drag/drop/paste
+│   ├── ResultPanel.tsx             # Comparaison avant/après + téléchargement
+│   └── ErrorBoundary.tsx           # Fallback erreur React
+├── hooks/
+│   ├── useTheme.ts                 # Persistance du thème
+│   └── useCredits.ts               # Fetch et refresh du solde
 ├── lib/
-│   ├── session.ts            # ID de session anonyme (localStorage)
-│   └── serverCredits.ts      # Validation & décompte crédits côté serveur
-├── store/
-│   └── creditsStore.ts       # État Zustand des crédits client
+│   ├── session.ts                  # ID de session anonyme (localStorage)
+│   └── serverCredits.ts            # Débit/remboursement crédits côté serveur
 └── types/
-    └── imagetracerjs.d.ts    # Types pour imagetracerjs
+    ├── app.ts                      # Types partagés (Mode, Status, Theme)
+    └── imagetracerjs.d.ts          # Types pour imagetracerjs
 ```
 
 ## ⚙️ Comment ça fonctionne
@@ -103,6 +109,6 @@ src/
 **Mode IA**
 
 1. L'image est envoyée à `POST /api/vectorize` avec un `sessionId`
-2. La route vérifie les crédits disponibles (Supabase ou mémoire)
+2. La route débite les crédits **avant** l'appel API (remboursement automatique en cas d'échec)
 3. L'image est transmise à l'API externe avec authentification Basic Auth
-4. Le SVG est retourné au client et les crédits sont débités
+4. Le SVG est retourné au client

@@ -1,35 +1,39 @@
-import { CREDIT_COSTS } from "@/lib/creditCosts";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+const CREDIT_COSTS = {
+  vectorize_image: 15,
+} as const;
 
 type Action = keyof typeof CREDIT_COSTS;
 
 const FREE_CREDITS = 500;
 
-// ---------------------------------------------------------------------------
 // In-memory fallback (dev sans Supabase)
-// ---------------------------------------------------------------------------
 const memStore = new Map<string, number>();
 
-function memCanUse(sessionId: string, action: Action): boolean {
-  return (memStore.get(sessionId) ?? FREE_CREDITS) >= CREDIT_COSTS[action];
+function memBalance(sessionId: string): number {
+  return memStore.get(sessionId) ?? FREE_CREDITS;
 }
 
 function memSpend(sessionId: string, action: Action): boolean {
-  const remaining = memStore.get(sessionId) ?? FREE_CREDITS;
+  const remaining = memBalance(sessionId);
   const cost = CREDIT_COSTS[action];
   if (remaining < cost) return false;
   memStore.set(sessionId, remaining - cost);
   return true;
 }
 
-// ---------------------------------------------------------------------------
-// Supabase backend — singleton pour éviter une connexion par requête
-// ---------------------------------------------------------------------------
+function memRefund(sessionId: string, action: Action): void {
+  memStore.set(sessionId, memBalance(sessionId) + CREDIT_COSTS[action]);
+}
+
+// Supabase backend
+// Note: uses SUPABASE_URL / SUPABASE_ANON_KEY (server-only, no NEXT_PUBLIC_)
 let _sb: SupabaseClient | null = null;
 
 async function getSupabase(): Promise<SupabaseClient | null> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY;
   if (!url || !key) return null;
   if (_sb) return _sb;
   const { createClient } = await import("@supabase/supabase-js");
@@ -37,18 +41,26 @@ async function getSupabase(): Promise<SupabaseClient | null> {
   return _sb;
 }
 
-async function supabaseCanUse(sessionId: string, action: Action): Promise<boolean> {
-  const sb = await getSupabase();
-  if (!sb) return memCanUse(sessionId, action);
-
-  const { data, error } = await sb
+async function sbGetCredits(sb: SupabaseClient, sessionId: string): Promise<number> {
+  const { data } = await sb
     .from("session_credits")
     .select("credits")
     .eq("session_id", sessionId)
     .single();
+  return data?.credits ?? FREE_CREDITS;
+}
 
-  if (error || !data) return CREDIT_COSTS[action] <= FREE_CREDITS;
-  return data.credits >= CREDIT_COSTS[action];
+async function sbSetCredits(sb: SupabaseClient, sessionId: string, credits: number): Promise<void> {
+  const { error } = await sb
+    .from("session_credits")
+    .upsert({ session_id: sessionId, credits }, { onConflict: "session_id" });
+  if (error) console.error("[serverCredits] upsert failed:", error);
+}
+
+async function supabaseBalance(sessionId: string): Promise<number> {
+  const sb = await getSupabase();
+  if (!sb) return memBalance(sessionId);
+  return sbGetCredits(sb, sessionId);
 }
 
 async function supabaseSpend(sessionId: string, action: Action): Promise<boolean> {
@@ -56,34 +68,28 @@ async function supabaseSpend(sessionId: string, action: Action): Promise<boolean
   if (!sb) return memSpend(sessionId, action);
 
   const cost = CREDIT_COSTS[action];
-
-  const { data: existing } = await sb
-    .from("session_credits")
-    .select("credits")
-    .eq("session_id", sessionId)
-    .single();
-
-  const current = existing?.credits ?? FREE_CREDITS;
+  const current = await sbGetCredits(sb, sessionId);
   if (current < cost) return false;
-
-  const { error } = await sb
-    .from("session_credits")
-    .upsert({ session_id: sessionId, credits: current - cost }, { onConflict: "session_id" });
-
-  if (error) {
-    console.error("[serverCredits] upsert failed:", error);
-    return false;
-  }
+  await sbSetCredits(sb, sessionId, current - cost);
   return true;
 }
 
-// ---------------------------------------------------------------------------
+async function supabaseRefund(sessionId: string, action: Action): Promise<void> {
+  const sb = await getSupabase();
+  if (!sb) { memRefund(sessionId, action); return; }
+  const current = await sbGetCredits(sb, sessionId);
+  await sbSetCredits(sb, sessionId, current + CREDIT_COSTS[action]);
+}
+
 // API publique
-// ---------------------------------------------------------------------------
-export async function serverCanUse(sessionId: string, action: Action): Promise<boolean> {
-  return supabaseCanUse(sessionId, action);
+export async function serverBalance(sessionId: string): Promise<number> {
+  return supabaseBalance(sessionId);
 }
 
 export async function serverSpend(sessionId: string, action: Action): Promise<boolean> {
   return supabaseSpend(sessionId, action);
+}
+
+export async function serverRefund(sessionId: string, action: Action): Promise<void> {
+  return supabaseRefund(sessionId, action);
 }

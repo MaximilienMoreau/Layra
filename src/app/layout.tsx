@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Layra — PNG & JPEG to SVG",
-  description: "Vectorisez vos images PNG et JPEG en SVG en quelques secondes, propulsé par l'IA.",
+  title: "Layra : PNG, JPEG & WebP to SVG",
+  description: "Vectorisez vos images PNG, JPEG et WebP en SVG en quelques secondes, propulsé par l'IA.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

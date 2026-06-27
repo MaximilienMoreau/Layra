@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import {
   Upload, Download, Zap, Sparkles, RotateCcw,
-  ArrowRight, AlertCircle, Loader2, FileImage, Sun, Moon,
+  ArrowRight, AlertCircle, Loader2, FileImage, Sun, Moon, X,
 } from "lucide-react";
 import { getSessionId } from "@/lib/session";
 
@@ -20,8 +20,8 @@ const MODES = [
 ] as const;
 
 const INFO_CARDS = [
-  { icon: Zap,      title: "Mode Rapide — gratuit",   desc: "Traitement 100% local, aucune donnée envoyée. Parfait pour logos et illustrations flat." },
-  { icon: Sparkles, title: "Mode IA — résultats pro", desc: "Résultats haute qualité sur photos et visuels complexes. Nécessite une clé API." },
+  { icon: Zap,      title: "Mode Rapide",   desc: "Traitement 100% local, aucune donnée envoyée. Parfait pour logos et illustrations flat." },
+  { icon: Sparkles, title: "Mode IA",       desc: "Résultats haute qualité sur photos et visuels complexes. Nécessite une clé API." },
   { icon: Download, title: "SVG scalable à l'infini", desc: "Le fichier généré est propre, léger, et s'adapte à toutes les tailles sans perte." },
 ] as const;
 
@@ -35,6 +35,7 @@ export default function VectorizerApp() {
   const [svgUrl, setSvgUrl]           = useState<string | null>(null);
   const [error, setError]             = useState<string | null>(null);
   const [dragging, setDragging]       = useState(false);
+  const [credits, setCredits]         = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const origUrlRef   = useRef<string | null>(null);
@@ -54,6 +55,21 @@ export default function VectorizerApp() {
     if (origUrlRef.current) URL.revokeObjectURL(origUrlRef.current);
     if (svgUrlRef.current)  URL.revokeObjectURL(svgUrlRef.current);
   }, []);
+
+  const fetchCredits = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/credits?sessionId=${getSessionId()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCredits(data.credits);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (mode !== "ai") { setCredits(null); return; }
+    fetchCredits();
+  }, [mode, fetchCredits]);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
@@ -86,6 +102,26 @@ export default function VectorizerApp() {
     setStatus("idle");
     setError(null);
   }, []);
+
+  // Paste support (Ctrl+V)
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const data = e.clipboardData;
+      if (!data) return;
+      // Fichiers collés directement (glisser-déposer puis coller)
+      const directFile = data.files[0];
+      if (directFile && ALLOWED_TYPES.has(directFile.type)) { loadFile(directFile); return; }
+      // Données image dans le presse-papiers (captures d'écran, Snipping Tool, etc.)
+      for (const item of data.items) {
+        if (item.kind === "file" && ALLOWED_TYPES.has(item.type)) {
+          const f = item.getAsFile();
+          if (f) { loadFile(f); return; }
+        }
+      }
+    };
+    document.addEventListener("paste", onPaste);
+    return () => document.removeEventListener("paste", onPaste);
+  }, [loadFile]);
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -138,12 +174,16 @@ export default function VectorizerApp() {
       setSvgResult(svg);
       setSvgUrl(url);
       setStatus("done");
+      if (mode === "ai") fetchCredits();
     } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return;
+      if (err instanceof Error && err.name === "AbortError") {
+        setStatus("idle");
+        return;
+      }
       setError(err instanceof Error ? err.message : "Erreur inconnue");
       setStatus("error");
     }
-  }, [file, mode]);
+  }, [file, mode, fetchCredits]);
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
@@ -169,12 +209,16 @@ export default function VectorizerApp() {
     URL.revokeObjectURL(url);
   }, [svgResult, file]);
 
-  const hasDone = status === "done" && svgUrl;
+  const hasDone   = status === "done" && svgUrl;
+  const svgSizeKb = useMemo(
+    () => svgResult ? Math.round(new Blob([svgResult]).size / 1024) : null,
+    [svgResult]
+  );
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
 
-      {/* ── Header ── */}
+      {/* Header */}
       <header style={{ borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-header)" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
@@ -186,7 +230,7 @@ export default function VectorizerApp() {
               className="hidden sm:inline-block text-xs font-medium px-2 py-0.5 rounded-full ml-1"
               style={{ background: "rgba(249,115,22,0.12)", color: "#fb923c", border: "1px solid rgba(249,115,22,0.2)" }}
             >
-              PNG & JPEG → SVG
+              PNG, JPEG & WebP → SVG
             </span>
           </div>
 
@@ -208,7 +252,7 @@ export default function VectorizerApp() {
                     className="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
                     style={{ background: m.subBg, color: m.subColor }}
                   >
-                    {m.sub}
+                    {m.id === "ai" && credits !== null ? `${credits} cr.` : m.sub}
                   </span>
                 </button>
               ))}
@@ -227,30 +271,30 @@ export default function VectorizerApp() {
         </div>
       </header>
 
-      {/* ── Mode indicator ── */}
+      {/* Mode indicator */}
       <div style={{ background: "var(--bg-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-2">
           {mode === "fast" ? (
             <>
               <Zap size={11} style={{ color: "#34d399", flexShrink: 0 }} />
               <span className="text-xs font-medium" style={{ color: "#34d399" }}>Mode Rapide</span>
-              <span className="text-xs" style={{ color: "var(--text-dim)" }}>— traitement 100% local, aucune donnée envoyée</span>
+              <span className="text-xs" style={{ color: "var(--text-dim)" }}>traitement 100% local, aucune donnée envoyée</span>
             </>
           ) : (
             <>
               <Sparkles size={11} style={{ color: "#fbbf24", flexShrink: 0 }} />
               <span className="text-xs font-medium" style={{ color: "#fbbf24" }}>Mode IA</span>
-              <span className="text-xs" style={{ color: "var(--text-dim)" }}>— résultats haute qualité, traitement côté serveur</span>
+              <span className="text-xs" style={{ color: "var(--text-dim)" }}>résultats haute qualité, traitement côté serveur</span>
             </>
           )}
         </div>
       </div>
 
-      {/* ── Hero text ── */}
+      {/* Hero text */}
       {!file && (
         <div className="text-center px-6 pt-16 pb-10">
           <h1 className="text-4xl font-bold tracking-tight mb-3 text-gradient">
-            PNG & JPEG → SVG
+            PNG, JPEG & WebP → SVG
           </h1>
           <p style={{ color: "var(--text-muted)", fontSize: 16 }}>
             Transformez vos images en SVG vectoriels parfaits en quelques secondes.
@@ -258,7 +302,7 @@ export default function VectorizerApp() {
         </div>
       )}
 
-      {/* ── Main ── */}
+      {/* Main */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 pb-16" style={{ paddingTop: file ? 40 : 0 }}>
 
         {!hasDone ? (
@@ -292,6 +336,15 @@ export default function VectorizerApp() {
                     {mode === "fast" ? "Traitement local" : "Analyse par IA"}
                   </p>
                 </div>
+                {mode === "ai" && (
+                  <button
+                    onClick={() => abortRef.current?.abort()}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                    style={{ color: "var(--text-inactive)", background: "var(--bg-subtle)", border: "1px solid var(--border-medium)" }}
+                  >
+                    <X size={11} /> Annuler
+                  </button>
+                )}
               </div>
             ) : file && originalUrl ? (
               <div className="flex flex-col items-center gap-5 p-6 w-full">
@@ -352,7 +405,9 @@ export default function VectorizerApp() {
               <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(249,115,22,0.2)", background: "var(--bg-surface)" }}>
                 <div className="px-4 py-2.5 flex items-center justify-between" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
                   <span className="text-xs font-semibold" style={{ color: "#fb923c" }}>SVG vectoriel</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(52,211,153,0.1)", color: "#34d399" }}>✓ Prêt</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(52,211,153,0.1)", color: "#34d399" }}>
+                    ✓ Prêt{svgSizeKb !== null ? ` · ${svgSizeKb} Ko` : ""}
+                  </span>
                 </div>
                 <div className="checker flex items-center justify-center p-6" style={{ minHeight: 260 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -362,13 +417,20 @@ export default function VectorizerApp() {
             </div>
 
             <div className="flex items-center justify-between gap-4 flex-wrap">
-              <button
-                onClick={reset}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: "var(--bg-subtle)", color: "var(--text-muted)", border: "1px solid var(--border-medium)" }}
-              >
-                <RotateCcw size={15} /> Vectoriser une autre image
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={reset}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                  style={{ background: "var(--bg-subtle)", color: "var(--text-muted)", border: "1px solid var(--border-medium)" }}
+                >
+                  <RotateCcw size={15} /> Vectoriser une autre image
+                </button>
+                {file && svgSizeKb !== null && (
+                  <span className="text-xs hidden sm:inline" style={{ color: "var(--text-dim)" }}>
+                    {Math.round(file.size / 1024)} Ko → {svgSizeKb} Ko SVG
+                  </span>
+                )}
+              </div>
               <button
                 onClick={download}
                 className="btn-accent flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-xl shadow-rose-500/20"

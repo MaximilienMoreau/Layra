@@ -12,8 +12,6 @@ Deux modes : traitement local gratuit, ou vectorisation IA haute qualité.
 
 </div>
 
----
-
 ## ✨ Fonctionnalités
 
 | | |
@@ -25,8 +23,6 @@ Deux modes : traitement local gratuit, ou vectorisation IA haute qualité.
 | ⬇️ **Téléchargement direct** | Fichier `.svg` propre, léger, scalable à l'infini |
 | 🌙 **Thème sombre / clair** | Bascule en un clic, préférence persistée dans `localStorage` |
 | 🪙 **Crédits** | 500 crédits gratuits · 15 crédits par vectorisation IA |
-
----
 
 ## 🚀 Démarrage rapide
 
@@ -64,8 +60,6 @@ Ouvrez [http://localhost:3000](http://localhost:3000).
 
 > **WSL2** Le navigateur Windows accède au serveur via l'IP WSL2 : `http://172.x.x.x:3000`
 
----
-
 ## 🛠️ Stack technique
 
 | Couche | Technologie |
@@ -76,8 +70,6 @@ Ouvrez [http://localhost:3000](http://localhost:3000).
 | Vectorisation IA | API externe (Basic Auth) |
 | État | Zustand v5 |
 | Persistance crédits | Supabase (optionnel) |
-
----
 
 ## 📁 Structure du projet
 
@@ -99,8 +91,6 @@ src/
 └── types/
     └── imagetracerjs.d.ts    # Types pour imagetracerjs
 ```
-
----
 
 ## ⚙️ Comment ça fonctionne
 

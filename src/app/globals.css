@@ -23,6 +23,27 @@
   --border-toggle:  rgba(255,255,255,0.07);
   --checker-sq:     #1a1a2e;
   --checker-bg:     #141428;
+
+  /* Brand colors — theme-independent */
+  --color-fast:          #34d399;
+  --color-fast-bg:       rgba(52,211,153,0.12);
+  --color-fast-border:   rgba(52,211,153,0.25);
+  --color-fast-subtle:   rgba(52,211,153,0.05);
+
+  --color-ai:            #fbbf24;
+  --color-ai-bg:         rgba(251,191,36,0.12);
+  --color-ai-border:     rgba(251,191,36,0.25);
+  --color-ai-subtle:     rgba(251,191,36,0.05);
+
+  --color-accent:        #fb923c;
+  --color-accent-alt:    #f97316;
+  --color-accent-bg:     rgba(249,115,22,0.12);
+  --color-accent-border: rgba(249,115,22,0.2);
+  --color-accent-subtle: rgba(249,115,22,0.05);
+
+  --color-error:         #f87171;
+  --color-error-bg:      rgba(239,68,68,0.08);
+  --color-error-border:  rgba(239,68,68,0.2);
 }
 
 [data-theme="light"] {
@@ -65,7 +86,6 @@ html, body {
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--border-medium); }
 
-/* ── Accent button ── */
 .btn-accent {
   background: linear-gradient(135deg, #f97316, #e11d48 52%, #7c3aed);
   transition: filter 0.15s, transform 0.12s;
@@ -74,7 +94,6 @@ html, body {
 .btn-accent:active:not(:disabled) { transform: scale(0.97); }
 .btn-accent:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* ── Gradient text ── */
 .text-gradient {
   background: linear-gradient(135deg, #fb923c 10%, #f43f5e 55%, #a78bfa);
   -webkit-background-clip: text;
@@ -92,4 +111,3 @@ html, body {
   background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
   background-color: var(--checker-bg);
 }
-

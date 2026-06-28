@@ -4,15 +4,15 @@ import { useState, useCallback, useEffect } from "react";
 import type { Theme } from "@/types/app";
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "dark";
+    const saved = localStorage.getItem("layra-theme") as Theme | null;
+    return saved === "light" || saved === "dark" ? saved : "dark";
+  });
 
   useEffect(() => {
-    const saved = localStorage.getItem("layra-theme") as Theme | null;
-    if (saved === "light" || saved === "dark") {
-      setTheme(saved);
-      document.documentElement.dataset.theme = saved;
-    }
-  }, []);
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {

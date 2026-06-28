@@ -20,9 +20,11 @@ export function useCredits(mode: Mode) {
   }, []);
 
   useEffect(() => {
-    if (mode !== "ai") { setCredits(null); return; }
+    if (mode !== "ai") return;
+    // fetchCredits is async — setState is called after await, not synchronously
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCredits();
   }, [mode, fetchCredits]);
 
-  return { credits, fetchCredits };
+  return { credits: mode === "ai" ? credits : null, fetchCredits };
 }

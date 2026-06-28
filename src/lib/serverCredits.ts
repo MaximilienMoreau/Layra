@@ -68,10 +68,24 @@ async function supabaseSpend(sessionId: string, action: Action): Promise<boolean
   if (!sb) return memSpend(sessionId, action);
 
   const cost = CREDIT_COSTS[action];
+
+  // Ensure the row exists before we try to update it (no-op if already there)
+  await sb
+    .from("session_credits")
+    .upsert({ session_id: sessionId, credits: FREE_CREDITS }, { onConflict: "session_id", ignoreDuplicates: true });
+
   const current = await sbGetCredits(sb, sessionId);
   if (current < cost) return false;
-  await sbSetCredits(sb, sessionId, current - cost);
-  return true;
+
+  // Conditional update: only succeeds if the balance hasn't been modified by a concurrent request
+  const { data } = await sb
+    .from("session_credits")
+    .update({ credits: current - cost })
+    .eq("session_id", sessionId)
+    .eq("credits", current)
+    .select("credits");
+
+  return Array.isArray(data) && data.length > 0;
 }
 
 async function supabaseRefund(sessionId: string, action: Action): Promise<void> {

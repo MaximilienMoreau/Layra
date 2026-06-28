@@ -41,6 +41,14 @@ export default function VectorizerApp() {
   const { theme, toggleTheme }   = useTheme();
   const { credits, fetchCredits } = useCredits(mode);
 
+  // Abort any in-progress AI request when the user switches modes
+  useEffect(() => {
+    if (status !== "loading") return;
+    abortRef.current?.abort();
+    setStatus("idle");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
+
   useEffect(() => () => {
     abortRef.current?.abort();
     if (origUrlRef.current) URL.revokeObjectURL(origUrlRef.current);
@@ -102,7 +110,7 @@ export default function VectorizerApp() {
           const t = setTimeout(() => reject(new Error("Timeout (>30s)")), 30_000);
           (tracer as typeof ImageTracer).imageToSVG(
             origUrlRef.current!,
-            (s: string) => { clearTimeout(t); s ? resolve(s) : reject(new Error("Résultat vide")); },
+            (s: string) => { clearTimeout(t); if (s) { resolve(s); } else { reject(new Error("Résultat vide")); } },
             { numberofcolors: 16, scale: 1, simplify: 0, pathomit: 8 }
           );
         });
